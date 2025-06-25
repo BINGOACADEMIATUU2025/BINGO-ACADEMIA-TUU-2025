@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BINGO ACADEMIA TUU 2025</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+    }
+    h1 {
+      color: #ffc400;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #download-btn {
+      margin: 10px 0;
+      background: #ffc400;
+      color: black;
+      padding: 10px 20px;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      display: none;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .cell {
+      background: white;
+      color: black;
+      border: 2px solid #ffc400;
+      padding: 5px;
+      position: relative;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 0.85em;
+      overflow: hidden;
+    }
+    .cell:hover .remove-btn {
+      display: block;
+    }
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Fixed: was 'cover' */
+      border-radius: 5px;
+    }
+    .upload-btn, .remove-btn {
+      font-size: 0.7em;
+      cursor: pointer;
+      position: absolute;
+      z-index: 2;
+    }
+    .upload-btn {
+      background: #ffc400;
+      color: black;
+      border: none;
+      bottom: 5px;
+      left: 5px;
+      padding: 4px 6px;
+    }
+    .remove-btn {
+      background: #000;
+      color: #ffc400;
+      border: 1px solid #ffc400;
+      top: 5px;
+      right: 5px;
+      padding: 3px 6px;
+      display: none;
+    }
+    .challenge-text {
+      z-index: 1;
+    }
+
+    /* Used only while hiding elements before screenshot */
+    .hide-temp {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="bingo-title">BINGO ACADEMIA TUU 2025</h1>
+  <button id="download-btn">Download Completed Board</button>
+  <div class="board" id="board"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    const FREE_IMAGE = 'logo.png';
+    const board = document.getElementById('board');
+    const downloadBtn = document.getElementById('download-btn');
+
+    const challenges = [
+      "Challenge 1", "Challenge 2", "Challenge 3", "Challenge 4", "Challenge 5",
+      "Challenge 6", "Challenge 7", "Challenge 8", "Challenge 9", "Challenge 10",
+      "Challenge 11", "Challenge 12", "FREE", "Challenge 13", "Challenge 14",
+      "Challenge 15", "Challenge 16", "Challenge 17", "Challenge 18", "Challenge 19",
+      "Challenge 20", "Challenge 21", "Challenge 22", "Challenge 23", "Challenge 24"
+    ];
+
+    let db;
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('BingoDB', 1);
+        request.onupgradeneeded = (e) => {
+          db = e.target.result;
+          db.createObjectStore('images');
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve();
+        };
+        request.onerror = reject;
+      });
+    }
+
+    function saveImage(index, dataUrl) {
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.put(dataUrl, index);
+      tx.oncomplete = renderBoard;
+    }
+
+    function getImage(index) {
+      return new Promise((resolve) => {
+        const tx = db.transaction('images', 'readonly');
+        const store = tx.objectStore('images');
+        const req = store.get(index);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    function deleteImage(index) {
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.delete(index);
+      tx.oncomplete = renderBoard;
+    }
+
+    async function isBoardComplete() {
+      for (let i = 0; i < challenges.length; i++) {
+        if (challenges[i] === "FREE") continue;
+        const img = await getImage(i);
+        if (!img) return false;
+      }
+      return true;
+    }
+
+    async function renderBoard() {
+      board.innerHTML = '';
+      for (let i = 0; i < challenges.length; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+
+        if (challenges[i] === "FREE") {
+          const img = document.createElement('img');
+          img.src = FREE_IMAGE;
+          img.alt = "Free Space";
+          cell.appendChild(img);
+        } else {
+          const imgData = await getImage(i);
+          if (imgData) {
+            const img = document.createElement('img');
+            img.src = imgData;
+            cell.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = 'Remove';
+            removeBtn.onclick = () => deleteImage(i);
+            cell.appendChild(removeBtn);
+          } else {
+            const label = document.createElement('div');
+            label.className = 'challenge-text';
+            label.textContent = challenges[i];
+            cell.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+
+            input.addEventListener('change', (e) => {
+              const file = e.target.files[0];
+              const reader = new FileReader();
+              reader.onload = () => saveImage(i, reader.result);
+              if (file) reader.readAsDataURL(file);
+            });
+
+            const btn = document.createElement('button');
+            btn.className = 'upload-btn';
+            btn.textContent = 'Upload';
+            btn.onclick = () => input.click();
+
+            cell.appendChild(btn);
+            cell.appendChild(input);
+          }
+        }
+
+        board.appendChild(cell);
+      }
+
+      if (await isBoardComplete()) {
+        downloadBtn.style.display = 'block';
+      } else {
+        downloadBtn.style.display = 'none';
+      }
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      // Temporarily hide buttons for screenshot
+      document.querySelectorAll('.upload-btn, .remove-btn, #download-btn').forEach(el => {
+        el.classList.add('hide-temp');
+      });
+
+      html2canvas(document.body, {
+        allowTaint: true,
+        useCORS: true,
+        scale: 2
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'bingo_academia_tuu_2025.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        // Restore buttons
+        document.querySelectorAll('.upload-btn, .remove-btn, #download-btn').forEach(el => {
+          el.classList.remove('hide-temp');
+        });
+      });
+    });
+
+    openDB().then(renderBoard);
+  </script>
+</body>
+</html>
