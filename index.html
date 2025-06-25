@@ -115,6 +115,13 @@
       border-radius: 5px;
     }
 
+    /* Special styling for the FREE space to prevent logo stretching */
+    #free-cell img {
+      max-width: 80%;
+      max-height: 80%;
+      object-fit: scale-down;
+    }
+
     .upload-btn, .remove-btn {
       font-size: 0.7em;
       cursor: pointer;
@@ -262,11 +269,104 @@
       tx.oncomplete = renderBoard;
     }
 
+    function captureFromCamera(index) {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function(stream) {
+            // Create a video element to show the camera stream
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.play();
+            
+            // Create a container for the camera interface
+            const cameraUI = document.createElement('div');
+            cameraUI.style.position = 'fixed';
+            cameraUI.style.top = '0';
+            cameraUI.style.left = '0';
+            cameraUI.style.width = '100%';
+            cameraUI.style.height = '100%';
+            cameraUI.style.backgroundColor = 'black';
+            cameraUI.style.zIndex = '1000';
+            cameraUI.style.display = 'flex';
+            cameraUI.style.flexDirection = 'column';
+            cameraUI.style.alignItems = 'center';
+            cameraUI.style.justifyContent = 'center';
+            
+            // Add the video to the container
+            video.style.maxWidth = '100%';
+            video.style.maxHeight = '80vh';
+            cameraUI.appendChild(video);
+            
+            // Add capture button
+            const captureBtn = document.createElement('button');
+            captureBtn.textContent = 'CAPTURE';
+            captureBtn.style.marginTop = '20px';
+            captureBtn.style.padding = '10px 20px';
+            captureBtn.style.background = '#ffc400';
+            captureBtn.style.color = 'black';
+            captureBtn.style.border = 'none';
+            captureBtn.style.borderRadius = '5px';
+            captureBtn.style.fontSize = '1em';
+            captureBtn.style.cursor = 'pointer';
+            
+            // Add cancel button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = 'CANCEL';
+            cancelBtn.style.marginTop = '10px';
+            cancelBtn.style.padding = '10px 20px';
+            cancelBtn.style.background = '#333';
+            cancelBtn.style.color = 'white';
+            cancelBtn.style.border = 'none';
+            cancelBtn.style.borderRadius = '5px';
+            cancelBtn.style.fontSize = '1em';
+            cancelBtn.style.cursor = 'pointer';
+            
+            cameraUI.appendChild(captureBtn);
+            cameraUI.appendChild(cancelBtn);
+            document.body.appendChild(cameraUI);
+            
+            // Handle capture
+            captureBtn.onclick = function() {
+              // Create canvas to capture the image
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              
+              // Stop the video stream
+              stream.getTracks().forEach(track => track.stop());
+              
+              // Save the image and remove the UI
+              saveImage(index, canvas.toDataURL('image/png'));
+              document.body.removeChild(cameraUI);
+            };
+            
+            // Handle cancel
+            cancelBtn.onclick = function() {
+              stream.getTracks().forEach(track => track.stop());
+              document.body.removeChild(cameraUI);
+            };
+          })
+          .catch(function(err) {
+            console.error("Camera error: ", err);
+            alert("Could not access the camera. Please check permissions and try again.");
+          });
+      } else {
+        alert("Camera access is not supported in your browser. Please use the file upload instead.");
+      }
+    }
+
     async function renderBoard() {
       board.innerHTML = '';
       for (let i = 0; i < challenges.length; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
+        
+        // Special ID for the FREE cell to prevent logo stretching
+        if (i === 12) {
+          cell.id = 'free-cell';
+        }
 
         if (challenges[i] === "FREE") {
           const img = document.createElement('img');
@@ -294,12 +394,33 @@
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
+            input.capture = 'environment'; // This enables camera on supported devices
             input.onchange = (e) => {
               const file = e.target.files[0];
-              const reader = new FileReader();
-              reader.onload = () => saveImage(i, reader.result);
-              if (file) reader.readAsDataURL(file);
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = () => saveImage(i, reader.result);
+                reader.readAsDataURL(file);
+              }
             };
+
+            // Add camera button for Android devices
+            if (/Android/i.test(navigator.userAgent)) {
+              const cameraBtn = document.createElement('button');
+              cameraBtn.className = 'upload-btn';
+              cameraBtn.textContent = 'Camera';
+              cameraBtn.onclick = (e) => {
+                e.stopPropagation();
+                captureFromCamera(i);
+              };
+              cell.appendChild(cameraBtn);
+            } else {
+              // Regular upload button for other devices
+              const uploadBtn = document.createElement('button');
+              uploadBtn.className = 'upload-btn';
+              uploadBtn.textContent = 'Upload';
+              cell.appendChild(uploadBtn);
+            }
 
             cell.appendChild(input);
           }
