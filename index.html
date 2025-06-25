@@ -59,7 +59,7 @@
     .letter-cell {
       background-color: #ffc400;
       color: white;
-      font-size: 2em;
+      font-size: 1.5em;
       font-weight: bold;
       text-align: center;
       display: flex;
@@ -88,19 +88,14 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      font-size: 0.75em;
+      font-size: 0.65em;
       overflow: hidden;
     }
 
-    if (body < 1080px){
-      .cell{
-        font-size: 0.50em;
+    @media (max-width: 480px) {
+      .cell {
+        font-size: 0.55em;
       }
-    }
-
-    .cell:hover .upload-btn,
-    .cell:hover .remove-btn {
-      display: block;
     }
 
     .cell img {
@@ -115,7 +110,7 @@
       cursor: pointer;
       position: absolute;
       z-index: 2;
-      display: none;
+      display: block;
     }
 
     .upload-btn {
@@ -145,13 +140,21 @@
     .hide-temp {
       display: none !important;
     }
+
+    input[type="file"] {
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>Desafio Gamificação Academia TUU 2025</h1>
 
   <div class="board-wrapper">
-    <!-- BINGO Header Row -->
     <div class="bingo-header">
       <div class="letter-cell">B</div>
       <div class="letter-cell">I</div>
@@ -159,8 +162,6 @@
       <div class="letter-cell">G</div>
       <div class="letter-cell">O</div>
     </div>
-
-    <!-- Bingo Board -->
     <div class="board" id="board"></div>
   </div>
 
@@ -179,7 +180,7 @@
       "STORY A IDENTIFICAR A ACADEMIA.",
       "VISITAR 3 MARCOS TURÍSTICOS DA CIDADE.",
       "FAZER UM ELOGIO A UM DESCONHECIDO.",
-      "OFERECER ALGO FEITO À MãO A ALGUÉM.",
+      "OFERECER ALGO FEITO À MÃO A ALGUÉM.",
       "FOTO C/ MAIS DE 30 PESSOAS.",
       "JOGAR PEDRA PAPEL TESOURA COM UM DESCONHECIDO.",
       "ENTREVISTAR UM TUU SOBRE COMO É TRABALHAR NA TUU.",
@@ -261,7 +262,7 @@
 
             const removeBtn = document.createElement('button');
             removeBtn.className = 'remove-btn';
-            removeBtn.textContent = 'Remove';
+            removeBtn.textContent = 'Remover';
             removeBtn.onclick = () => deleteImage(i);
             cell.appendChild(removeBtn);
           } else {
@@ -273,21 +274,13 @@
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.style.display = 'none';
-
-            input.addEventListener('change', (e) => {
+            input.onchange = (e) => {
               const file = e.target.files[0];
               const reader = new FileReader();
               reader.onload = () => saveImage(i, reader.result);
               if (file) reader.readAsDataURL(file);
-            });
+            };
 
-            const btn = document.createElement('button');
-            btn.className = 'upload-btn';
-            btn.textContent = 'Upload';
-            btn.onclick = () => input.click();
-
-            cell.appendChild(btn);
             cell.appendChild(input);
           }
         }
