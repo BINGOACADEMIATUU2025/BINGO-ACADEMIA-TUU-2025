@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Desafio Gamificação Academia TUU 2025</title>
   <style>
     @font-face {
@@ -21,6 +21,7 @@
       flex-direction: column;
       align-items: center;
       padding: 10px;
+      -webkit-text-size-adjust: 100%;
     }
 
     h1 {
@@ -45,6 +46,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
     }
 
     .bingo-header {
@@ -90,11 +92,19 @@
       text-align: center;
       font-size: 0.65em;
       overflow: hidden;
+      padding: 2px;
+      box-sizing: border-box;
+      word-break: break-word;
+      hyphens: auto;
     }
 
     @media (max-width: 480px) {
       .cell {
         font-size: 0.55em;
+        padding: 1px;
+      }
+      .challenge-text {
+        font-size: 0.9em;
       }
     }
 
@@ -133,8 +143,18 @@
 
     .challenge-text {
       z-index: 1;
-      padding: 4px;
+      padding: 2px;
       font-size: 0.75em;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      line-height: 1.2;
     }
 
     .hide-temp {
