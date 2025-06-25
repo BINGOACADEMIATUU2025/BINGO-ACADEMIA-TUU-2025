@@ -118,8 +118,8 @@
 
     /* Special styling for the FREE space to prevent logo stretching */
     #free-cell img {
-      max-width: 80%;
-      max-height: 80%;
+      max-width: 110%;
+      max-height: 110%;
       object-fit: scale-down;
     }
 
@@ -134,11 +134,11 @@
       cursor: pointer;
       position: absolute;
       z-index: 2;
-      display: none; /* Hidden by default */
+      display: none;
     }
 
     .cell.show-remove .remove-btn {
-      display: block; /* Show when cell has show-remove class */
+      display: block;
     }
 
     .challenge-text {
@@ -169,118 +169,6 @@
       z-index: 3;
       cursor: pointer;
     }
-
-    /* Camera options menu */
-    .options-menu {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0,0,0,0.9);
-      z-index: 1000;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
-      border-radius: 15px 15px 0 0;
-    }
-
-    .options-menu.show {
-      transform: translateY(0);
-    }
-
-    .options-menu button {
-      width: 80%;
-      max-width: 300px;
-      margin: 10px 0;
-      padding: 15px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1em;
-      cursor: pointer;
-      font-family: 'DINBlack', sans-serif;
-    }
-
-    .camera-btn {
-      background: #ffc400;
-      color: black;
-    }
-
-    .gallery-btn {
-      background: #333;
-      color: white;
-    }
-
-    .cancel-btn {
-      background: #ff3333;
-      color: white;
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 999;
-      display: none;
-    }
-
-    .overlay.show {
-      display: block;
-    }
-
-    /* Camera preview styling */
-    .camera-preview {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      z-index: 1001;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .camera-preview video {
-      max-width: 100%;
-      max-height: 70vh;
-    }
-
-    .camera-controls {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .capture-btn {
-      background: #ffc400;
-      color: black;
-      border: none;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      margin: 10px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-
-    .close-camera {
-      background: #ff3333;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -299,37 +187,11 @@
 
   <button id="download-btn">DOWNLOAD</button>
 
-  <!-- Options overlay -->
-  <div class="overlay" id="overlay"></div>
-  <div class="options-menu" id="optionsMenu">
-    <button class="camera-btn" id="useCamera">Tirar Foto</button>
-    <button class="gallery-btn" id="useGallery">Escolher da Galeria</button>
-    <button class="cancel-btn" id="cancelOptions">Cancelar</button>
-  </div>
-
-  <!-- Camera preview -->
-  <div class="camera-preview" id="cameraPreview" style="display: none;">
-    <video id="cameraFeed" autoplay playsinline></video>
-    <div class="camera-controls">
-      <button class="capture-btn" id="captureBtn"></button>
-      <button class="close-camera" id="closeCamera">Fechar Câmera</button>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     const FREE_IMAGE = 'logo.png';
     const board = document.getElementById('board');
     const downloadBtn = document.getElementById('download-btn');
-    const overlay = document.getElementById('overlay');
-    const optionsMenu = document.getElementById('optionsMenu');
-    const useCameraBtn = document.getElementById('useCamera');
-    const useGalleryBtn = document.getElementById('useGallery');
-    const cancelOptionsBtn = document.getElementById('cancelOptions');
-    const cameraPreview = document.getElementById('cameraPreview');
-    const cameraFeed = document.getElementById('cameraFeed');
-    const captureBtn = document.getElementById('captureBtn');
-    const closeCamera = document.getElementById('closeCamera');
 
     const challenges = [
       "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
@@ -360,8 +222,6 @@
     ];
 
     let db;
-    let currentCellIndex = null;
-    let stream = null;
     let clickTimeout = null;
 
     function openDB() {
@@ -403,66 +263,6 @@
       tx.oncomplete = renderBoard;
     }
 
-    function showOptionsMenu(index) {
-      currentCellIndex = index;
-      overlay.classList.add('show');
-      optionsMenu.classList.add('show');
-    }
-
-    function hideOptionsMenu() {
-      overlay.classList.remove('show');
-      optionsMenu.classList.remove('show');
-    }
-
-    function showCameraPreview() {
-      hideOptionsMenu();
-      cameraPreview.style.display = 'flex';
-      
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'environment' },
-          audio: false 
-        }).then(function(s) {
-          stream = s;
-          cameraFeed.srcObject = stream;
-        }).catch(function(err) {
-          console.error("Camera error: ", err);
-          alert("Não foi possível acessar a câmera. Por favor verifique as permissões.");
-          closeCameraPreview();
-        });
-      } else {
-        alert("O acesso à câmera não é suportado no seu navegador.");
-        closeCameraPreview();
-      }
-    }
-
-    function closeCameraPreview() {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
-      cameraPreview.style.display = 'none';
-    }
-
-    function capturePhoto() {
-      const canvas = document.createElement('canvas');
-      canvas.width = cameraFeed.videoWidth;
-      canvas.height = cameraFeed.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
-      
-      saveImage(currentCellIndex, canvas.toDataURL('image/png'));
-      closeCameraPreview();
-    }
-
-    function openGallery() {
-      hideOptionsMenu();
-      const inputs = document.querySelectorAll('input[type="file"]');
-      if (currentCellIndex !== null && inputs[currentCellIndex]) {
-        inputs[currentCellIndex].click();
-      }
-    }
-
     function handleCellClick(index, hasImage, event) {
       // If clicking on the remove button, let it work normally
       if (event.target.classList.contains('remove-btn')) {
@@ -479,10 +279,6 @@
           event.currentTarget.classList.remove('show-remove');
         }, 3000);
       } 
-      // If cell is empty, show options menu
-      else {
-        showOptionsMenu(index);
-      }
     }
 
     async function renderBoard() {
@@ -527,6 +323,7 @@
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
+            input.capture = 'environment'; // This will show camera option on mobile
             input.onchange = (e) => {
               const file = e.target.files[0];
               if (file) {
@@ -536,8 +333,8 @@
               }
             };
 
-            // Click handler for empty cells
-            cell.onclick = (e) => handleCellClick(i, false, e);
+            // Make the whole cell clickable for file input
+            cell.onclick = () => input.click();
             cell.appendChild(input);
           }
         }
@@ -545,14 +342,6 @@
         board.appendChild(cell);
       }
     }
-
-    // Set up event listeners
-    useCameraBtn.onclick = showCameraPreview;
-    useGalleryBtn.onclick = openGallery;
-    cancelOptionsBtn.onclick = hideOptionsMenu;
-    overlay.onclick = hideOptionsMenu;
-    captureBtn.onclick = capturePhoto;
-    closeCamera.onclick = closeCameraPreview;
 
     // Hide remove buttons when clicking outside
     document.addEventListener('click', (e) => {
