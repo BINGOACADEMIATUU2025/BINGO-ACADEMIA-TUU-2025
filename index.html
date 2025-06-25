@@ -124,8 +124,8 @@
     }
 
     .remove-btn {
-      background: #000;
-      color: #ffc400;
+      background: #ffc400;
+      color: #FFFFFF;
       border: 1px solid #ffc400;
       top: 5px;
       right: 5px;
@@ -161,13 +161,9 @@
       display: none !important;
     }
 
-    input[type="file"] {
-      opacity: 0;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-      cursor: pointer;
+    /* Hidden file inputs */
+    .file-inputs {
+      display: none;
     }
   </style>
 </head>
@@ -185,6 +181,11 @@
     <div class="board" id="board"></div>
   </div>
 
+  <div class="file-inputs">
+    <input type="file" id="cameraInput" accept="image/*" capture="environment">
+    <input type="file" id="galleryInput" accept="image/*">
+  </div>
+
   <button id="download-btn">DOWNLOAD</button>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -192,6 +193,8 @@
     const FREE_IMAGE = 'logo.png';
     const board = document.getElementById('board');
     const downloadBtn = document.getElementById('download-btn');
+    const cameraInput = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
 
     const challenges = [
       "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
@@ -222,6 +225,7 @@
     ];
 
     let db;
+    let currentCellIndex = null;
     let clickTimeout = null;
 
     function openDB() {
@@ -278,7 +282,48 @@
         clickTimeout = setTimeout(() => {
           event.currentTarget.classList.remove('show-remove');
         }, 3000);
-      } 
+      } else {
+        // For empty cells, store the current index and trigger the appropriate input
+        currentCellIndex = index;
+        
+        // On mobile, show native action sheet for camera/gallery selection
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          if (confirm("Escolher foto da galeria ou tirar nova foto?\n(Cancelar para Galeria, OK para Câmera)")) {
+            cameraInput.click();
+          } else {
+            galleryInput.click();
+          }
+        } else {
+          // On desktop, just open file dialog
+          galleryInput.click();
+        }
+      }
+    }
+
+    function setupFileInputs() {
+      // Camera input handler
+      cameraInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file && currentCellIndex !== null) {
+          const reader = new FileReader();
+          reader.onload = () => saveImage(currentCellIndex, reader.result);
+          reader.readAsDataURL(file);
+        }
+        // Reset the input
+        cameraInput.value = '';
+      };
+
+      // Gallery input handler
+      galleryInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file && currentCellIndex !== null) {
+          const reader = new FileReader();
+          reader.onload = () => saveImage(currentCellIndex, reader.result);
+          reader.readAsDataURL(file);
+        }
+        // Reset the input
+        galleryInput.value = '';
+      };
     }
 
     async function renderBoard() {
@@ -320,22 +365,8 @@
             label.textContent = challenges[i];
             cell.appendChild(label);
 
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.capture = 'environment'; // This will show camera option on mobile
-            input.onchange = (e) => {
-              const file = e.target.files[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = () => saveImage(i, reader.result);
-                reader.readAsDataURL(file);
-              }
-            };
-
-            // Make the whole cell clickable for file input
-            cell.onclick = () => input.click();
-            cell.appendChild(input);
+            // Click handler for empty cells
+            cell.onclick = (e) => handleCellClick(i, false, e);
           }
         }
 
@@ -378,7 +409,12 @@
       });
     });
 
+    // Initialize
+    setupFileInputs();
     openDB().then(renderBoard);
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
