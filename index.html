@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BINGO ACADEMIA TUU 2025</title>
+  <title>Desafio Gamificação Academia TUU 2025</title>
   <style>
+    @font-face {
+      font-family: 'DINBlack';
+      src: local('DIN Black'), local('DIN-Black'),
+           url('https://fonts.cdnfonts.com/s/15151/DINBlack.woff') format('woff');
+      font-weight: bold;
+    }
+
     body {
       margin: 0;
-      font-family: sans-serif;
+      font-family: 'DINBlack', sans-serif;
       background-color: #000;
       color: white;
       display: flex;
@@ -15,13 +22,16 @@
       align-items: center;
       padding: 10px;
     }
+
     h1 {
       color: #ffc400;
       text-align: center;
       margin-bottom: 10px;
+      font-size: 1.5em;
     }
+
     #download-btn {
-      margin: 10px 0;
+      margin-top: 20px;
       background: #ffc400;
       color: black;
       padding: 10px 20px;
@@ -29,8 +39,36 @@
       font-size: 1em;
       cursor: pointer;
       border-radius: 5px;
-      display: none;
     }
+
+    .board-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bingo-header {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 8px;
+    }
+
+    .letter-cell {
+      background-color: #ffc400;
+      color: white;
+      font-size: 2em;
+      font-weight: bold;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      aspect-ratio: 1 / 1;
+      border: 2px solid #ffc400;
+    }
+
     .board {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -38,11 +76,11 @@
       width: 100%;
       max-width: 500px;
     }
+
     .cell {
       background: white;
       color: black;
       border: 2px solid #ffc400;
-      padding: 5px;
       position: relative;
       aspect-ratio: 1 / 1;
       display: flex;
@@ -50,24 +88,30 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      font-size: 0.85em;
+      font-size: 0.75em;
       overflow: hidden;
     }
+
+    .cell:hover .upload-btn,
     .cell:hover .remove-btn {
       display: block;
     }
+
     .cell img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Fixed: was 'cover' */
+      object-fit: contain;
       border-radius: 5px;
     }
+
     .upload-btn, .remove-btn {
       font-size: 0.7em;
       cursor: pointer;
       position: absolute;
       z-index: 2;
+      display: none;
     }
+
     .upload-btn {
       background: #ffc400;
       color: black;
@@ -76,6 +120,7 @@
       left: 5px;
       padding: 4px 6px;
     }
+
     .remove-btn {
       background: #000;
       color: #ffc400;
@@ -83,22 +128,37 @@
       top: 5px;
       right: 5px;
       padding: 3px 6px;
-      display: none;
-    }
-    .challenge-text {
-      z-index: 1;
     }
 
-    /* Used only while hiding elements before screenshot */
+    .challenge-text {
+      z-index: 1;
+      padding: 4px;
+      font-size: 0.75em;
+    }
+
     .hide-temp {
       display: none !important;
     }
   </style>
 </head>
 <body>
-  <h1 id="bingo-title">BINGO ACADEMIA TUU 2025</h1>
-  <button id="download-btn">Download Completed Board</button>
-  <div class="board" id="board"></div>
+  <h1>Desafio Gamificação Academia TUU 2025</h1>
+
+  <div class="board-wrapper">
+    <!-- BINGO Header Row -->
+    <div class="bingo-header">
+      <div class="letter-cell">B</div>
+      <div class="letter-cell">I</div>
+      <div class="letter-cell">N</div>
+      <div class="letter-cell">G</div>
+      <div class="letter-cell">O</div>
+    </div>
+
+    <!-- Bingo Board -->
+    <div class="board" id="board"></div>
+  </div>
+
+  <button id="download-btn">DOWNLOAD</button>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
@@ -107,11 +167,31 @@
     const downloadBtn = document.getElementById('download-btn');
 
     const challenges = [
-      "Challenge 1", "Challenge 2", "Challenge 3", "Challenge 4", "Challenge 5",
-      "Challenge 6", "Challenge 7", "Challenge 8", "Challenge 9", "Challenge 10",
-      "Challenge 11", "Challenge 12", "FREE", "Challenge 13", "Challenge 14",
-      "Challenge 15", "Challenge 16", "Challenge 17", "Challenge 18", "Challenge 19",
-      "Challenge 20", "Challenge 21", "Challenge 22", "Challenge 23", "Challenge 24"
+      "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
+      "FOTO C/ LONA DE OBRA DA TUU.",
+      "TROCAR DE NOMES COM UM PARTICIPANTE DURANTE UMA HORA.",
+      "STORY A IDENTIFICAR A ACADEMIA.",
+      "VISITAR 3 MARCOS TURÍSTICOS DA CIDADE.",
+      "FAZER UM ELOGIO A UM DESCONHECIDO.",
+      "OFERECER ALGO FEITO À MãO A ALGUÉM.",
+      "FOTO C/ MAIS DE 30 PESSOAS.",
+      "JOGAR PEDRA PAPEL TESOURA COM UM DESCONHECIDO.",
+      "ENTREVISTAR UM TUU SOBRE COMO É TRABALHAR NA TUU.",
+      "DESENHAR UM EDIFICIO QUE TENHA CHAMADO À ATENÇÃO.",
+      "APRESENTAR UM POWERPOINT FEITO POR OUTRA PESSOA.",
+      "FREE",
+      "ESCREVER UMA CARTA COM ESPECTATIVAS PARA A ACADEMIA.",
+      "ENCONTRAR UM PARTICIPANTE QUE FALE MAIS QUE 2 LINGUAS.",
+      "FOTO C/UM TUU.",
+      "INVENTAR UM JINGLE PARA A ACADEMIA.",
+      "IMITAR O BARULHO DE UM BERBEQUIM.",
+      "TROCAR UMA LEMBRANÇA COM OUTRO PARTICIPANTE.",
+      "FOTO C/UMA ESCAVADORA.",
+      "NÃO FALAR DURANTE 15 MINUTOS.",
+      "ENCONTRAR UM PARTICIPANTE QUE TENHA UMA TATUAGEM.",
+      "FOTO C/UMA OBRA DA TUU TERMINADA.",
+      "FAZER UMA PERGUNTA A UM DRADOR CRIAR UMA ALCUNHA PARA OUTRO PARTICIPANTE.",
+      "MOSTRAR UMA HABILIDADE OCULTA A UM TUU."
     ];
 
     let db;
@@ -153,15 +233,6 @@
       const store = tx.objectStore('images');
       store.delete(index);
       tx.oncomplete = renderBoard;
-    }
-
-    async function isBoardComplete() {
-      for (let i = 0; i < challenges.length; i++) {
-        if (challenges[i] === "FREE") continue;
-        const img = await getImage(i);
-        if (!img) return false;
-      }
-      return true;
     }
 
     async function renderBoard() {
@@ -217,21 +288,14 @@
 
         board.appendChild(cell);
       }
-
-      if (await isBoardComplete()) {
-        downloadBtn.style.display = 'block';
-      } else {
-        downloadBtn.style.display = 'none';
-      }
     }
 
     downloadBtn.addEventListener('click', () => {
-      // Temporarily hide buttons for screenshot
       document.querySelectorAll('.upload-btn, .remove-btn, #download-btn').forEach(el => {
         el.classList.add('hide-temp');
       });
 
-      html2canvas(document.body, {
+      html2canvas(document.querySelector('.board-wrapper'), {
         allowTaint: true,
         useCORS: true,
         scale: 2
@@ -241,7 +305,6 @@
         link.href = canvas.toDataURL('image/png');
         link.click();
 
-        // Restore buttons
         document.querySelectorAll('.upload-btn, .remove-btn, #download-btn').forEach(el => {
           el.classList.remove('hide-temp');
         });
