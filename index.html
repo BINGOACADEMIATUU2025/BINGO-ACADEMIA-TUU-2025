@@ -96,6 +96,7 @@
       box-sizing: border-box;
       word-break: break-word;
       hyphens: auto;
+      cursor: pointer;
     }
 
     @media (max-width: 480px) {
@@ -122,23 +123,6 @@
       object-fit: scale-down;
     }
 
-    .upload-btn, .remove-btn {
-      font-size: 0.7em;
-      cursor: pointer;
-      position: absolute;
-      z-index: 2;
-      display: block;
-    }
-
-    .upload-btn {
-      background: #ffc400;
-      color: black;
-      border: none;
-      bottom: 5px;
-      left: 5px;
-      padding: 4px 6px;
-    }
-
     .remove-btn {
       background: #000;
       color: #ffc400;
@@ -146,6 +130,11 @@
       top: 5px;
       right: 5px;
       padding: 3px 6px;
+      font-size: 0.7em;
+      cursor: pointer;
+      position: absolute;
+      z-index: 2;
+      display: block;
     }
 
     .challenge-text {
@@ -176,6 +165,67 @@
       z-index: 3;
       cursor: pointer;
     }
+
+    /* Camera options menu */
+    .camera-options {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .camera-options.show {
+      transform: translateY(0);
+    }
+
+    .camera-options button {
+      width: 80%;
+      max-width: 300px;
+      margin: 10px 0;
+      padding: 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .camera-btn {
+      background: #ffc400;
+      color: black;
+    }
+
+    .upload-btn {
+      background: #333;
+      color: white;
+    }
+
+    .cancel-btn {
+      background: #ff3333;
+      color: white;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+      display: none;
+    }
+
+    .overlay.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -194,11 +244,24 @@
 
   <button id="download-btn">DOWNLOAD</button>
 
+  <!-- Camera options overlay -->
+  <div class="overlay" id="overlay"></div>
+  <div class="camera-options" id="cameraOptions">
+    <button class="camera-btn" id="useCamera">Usar Câmera</button>
+    <button class="upload-btn" id="uploadPhoto">Carregar da Galeria</button>
+    <button class="cancel-btn" id="cancelOptions">Cancelar</button>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     const FREE_IMAGE = 'logo.png';
     const board = document.getElementById('board');
     const downloadBtn = document.getElementById('download-btn');
+    const overlay = document.getElementById('overlay');
+    const cameraOptions = document.getElementById('cameraOptions');
+    const useCameraBtn = document.getElementById('useCamera');
+    const uploadPhotoBtn = document.getElementById('uploadPhoto');
+    const cancelOptionsBtn = document.getElementById('cancelOptions');
 
     const challenges = [
       "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
@@ -229,6 +292,7 @@
     ];
 
     let db;
+    let currentCellIndex = null;
 
     function openDB() {
       return new Promise((resolve, reject) => {
@@ -269,16 +333,25 @@
       tx.oncomplete = renderBoard;
     }
 
-    function captureFromCamera(index) {
+    function showCameraOptions(index) {
+      currentCellIndex = index;
+      overlay.classList.add('show');
+      cameraOptions.classList.add('show');
+    }
+
+    function hideCameraOptions() {
+      overlay.classList.remove('show');
+      cameraOptions.classList.remove('show');
+      currentCellIndex = null;
+    }
+
+    function captureFromCamera() {
+      hideCameraOptions();
+      
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
           .then(function(stream) {
-            // Create a video element to show the camera stream
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.play();
-            
-            // Create a container for the camera interface
+            // Create camera interface
             const cameraUI = document.createElement('div');
             cameraUI.style.position = 'fixed';
             cameraUI.style.top = '0';
@@ -292,57 +365,52 @@
             cameraUI.style.alignItems = 'center';
             cameraUI.style.justifyContent = 'center';
             
-            // Add the video to the container
+            const video = document.createElement('video');
+            video.srcObject = stream;
             video.style.maxWidth = '100%';
             video.style.maxHeight = '80vh';
+            video.play();
             cameraUI.appendChild(video);
             
-            // Add capture button
             const captureBtn = document.createElement('button');
-            captureBtn.textContent = 'CAPTURE';
+            captureBtn.textContent = 'CAPTURAR';
             captureBtn.style.marginTop = '20px';
-            captureBtn.style.padding = '10px 20px';
+            captureBtn.style.padding = '15px 30px';
             captureBtn.style.background = '#ffc400';
             captureBtn.style.color = 'black';
             captureBtn.style.border = 'none';
             captureBtn.style.borderRadius = '5px';
-            captureBtn.style.fontSize = '1em';
+            captureBtn.style.fontSize = '1.2em';
             captureBtn.style.cursor = 'pointer';
             
-            // Add cancel button
             const cancelBtn = document.createElement('button');
-            cancelBtn.textContent = 'CANCEL';
+            cancelBtn.textContent = 'CANCELAR';
             cancelBtn.style.marginTop = '10px';
-            cancelBtn.style.padding = '10px 20px';
+            cancelBtn.style.padding = '15px 30px';
             cancelBtn.style.background = '#333';
             cancelBtn.style.color = 'white';
             cancelBtn.style.border = 'none';
             cancelBtn.style.borderRadius = '5px';
-            cancelBtn.style.fontSize = '1em';
+            cancelBtn.style.fontSize = '1.2em';
             cancelBtn.style.cursor = 'pointer';
             
             cameraUI.appendChild(captureBtn);
             cameraUI.appendChild(cancelBtn);
             document.body.appendChild(cameraUI);
             
-            // Handle capture
             captureBtn.onclick = function() {
-              // Create canvas to capture the image
               const canvas = document.createElement('canvas');
               canvas.width = video.videoWidth;
               canvas.height = video.videoHeight;
               const ctx = canvas.getContext('2d');
               ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
               
-              // Stop the video stream
               stream.getTracks().forEach(track => track.stop());
-              
-              // Save the image and remove the UI
-              saveImage(index, canvas.toDataURL('image/png'));
               document.body.removeChild(cameraUI);
+              
+              saveImage(currentCellIndex, canvas.toDataURL('image/png'));
             };
             
-            // Handle cancel
             cancelBtn.onclick = function() {
               stream.getTracks().forEach(track => track.stop());
               document.body.removeChild(cameraUI);
@@ -350,10 +418,10 @@
           })
           .catch(function(err) {
             console.error("Camera error: ", err);
-            alert("Could not access the camera. Please check permissions and try again.");
+            alert("Não foi possível aceder à câmera. Por favor verifique as permissões.");
           });
       } else {
-        alert("Camera access is not supported in your browser. Please use the file upload instead.");
+        alert("O acesso à câmera não é suportado no seu navegador. Por favor use a opção de carregar foto.");
       }
     }
 
@@ -363,7 +431,6 @@
         const cell = document.createElement('div');
         cell.className = 'cell';
         
-        // Special ID for the FREE cell to prevent logo stretching
         if (i === 12) {
           cell.id = 'free-cell';
         }
@@ -383,7 +450,10 @@
             const removeBtn = document.createElement('button');
             removeBtn.className = 'remove-btn';
             removeBtn.textContent = 'Remover';
-            removeBtn.onclick = () => deleteImage(i);
+            removeBtn.onclick = (e) => {
+              e.stopPropagation();
+              deleteImage(i);
+            };
             cell.appendChild(removeBtn);
           } else {
             const label = document.createElement('div');
@@ -394,7 +464,7 @@
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.capture = 'environment'; // This enables camera on supported devices
+            input.capture = 'environment';
             input.onchange = (e) => {
               const file = e.target.files[0];
               if (file) {
@@ -404,23 +474,12 @@
               }
             };
 
-            // Add camera button for Android devices
-            if (/Android/i.test(navigator.userAgent)) {
-              const cameraBtn = document.createElement('button');
-              cameraBtn.className = 'upload-btn';
-              cameraBtn.textContent = 'Camera';
-              cameraBtn.onclick = (e) => {
-                e.stopPropagation();
-                captureFromCamera(i);
-              };
-              cell.appendChild(cameraBtn);
-            } else {
-              // Regular upload button for other devices
-              const uploadBtn = document.createElement('button');
-              uploadBtn.className = 'upload-btn';
-              uploadBtn.textContent = 'Upload';
-              cell.appendChild(uploadBtn);
-            }
+            // Make the whole cell clickable for upload options
+            cell.onclick = (e) => {
+              if (e.target === cell || e.target === label) {
+                showCameraOptions(i);
+              }
+            };
 
             cell.appendChild(input);
           }
@@ -430,8 +489,21 @@
       }
     }
 
+    // Set up camera options buttons
+    useCameraBtn.onclick = captureFromCamera;
+    uploadPhotoBtn.onclick = function() {
+      hideCameraOptions();
+      // Trigger the file input for the current cell
+      const inputs = document.querySelectorAll('input[type="file"]');
+      if (currentCellIndex !== null && inputs[currentCellIndex]) {
+        inputs[currentCellIndex].click();
+      }
+    };
+    cancelOptionsBtn.onclick = hideCameraOptions;
+    overlay.onclick = hideCameraOptions;
+
     downloadBtn.addEventListener('click', () => {
-      document.querySelectorAll('.upload-btn, .remove-btn, #download-btn').forEach(el => {
+      document.querySelectorAll('.remove-btn, #download-btn').forEach(el => {
         el.classList.add('hide-temp');
       });
 
@@ -445,7 +517,7 @@
         link.href = canvas.toDataURL('image/png');
         link.click();
 
-        document.querySelectorAll('.upload-btn, .remove-btn, #download-btn').forEach(el => {
+        document.querySelectorAll('.remove-btn, #download-btn').forEach(el => {
           el.classList.remove('hide-temp');
         });
       });
