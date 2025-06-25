@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bingo Challenge App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      margin: 1rem;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      max-width: 95vw;
+      margin: auto;
+    }
+    .cell {
+      background: white;
+      border: 1px solid #ccc;
+      aspect-ratio: 1 / 1;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .cell-content {
+      padding: 4px;
+      font-size: 0.9rem;
+    }
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .cell input {
+      display: none;
+    }
+    .upload-btn {
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      z-index: 2;
+    }
+    #download {
+      margin: 1rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bingo Challenge</h1>
+  <div id="board"></div>
+  <button id="download">Download Completed Board</button>
+
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <script>
+    const board = document.getElementById('board');
+    const downloadBtn = document.getElementById('download');
+    const cellCount = 25;
+
+    const dbName = 'bingoDB';
+    const storeName = 'photos';
+    let db;
+
+    // Open IndexedDB
+    const request = indexedDB.open(dbName, 1);
+    request.onupgradeneeded = function(e) {
+      db = e.target.result;
+      db.createObjectStore(storeName);
+    };
+    request.onsuccess = function(e) {
+      db = e.target.result;
+      setupBoard();
+    };
+    request.onerror = function(e) {
+      console.error("IndexedDB error:", e);
+    };
+
+    function setupBoard() {
+      for (let i = 0; i < cellCount; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = i;
+
+        const content = document.createElement('div');
+        content.className = 'cell-content';
+        content.innerText = `Challenge ${i + 1}`;
+        cell.appendChild(content);
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+
+        const btn = document.createElement('button');
+        btn.className = 'upload-btn';
+        btn.innerText = '📷';
+
+        btn.onclick = () => input.click();
+
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const imgData = evt.target.result;
+            storeImage(i, imgData);
+            renderImage(cell, imgData);
+            checkComplete();
+          };
+          reader.readAsDataURL(file);
+        };
+
+        cell.appendChild(btn);
+        cell.appendChild(input);
+        board.appendChild(cell);
+
+        // Load image if already saved
+        loadImage(i).then((imgData) => {
+          if (imgData) {
+            renderImage(cell, imgData);
+          }
+        });
+      }
+    }
+
+    function storeImage(index, dataUrl) {
+      const tx = db.transaction([storeName], 'readwrite');
+      const store = tx.objectStore(storeName);
+      store.put(dataUrl, index);
+    }
+
+    function loadImage(index) {
+      return new Promise((resolve) => {
+        const tx = db.transaction([storeName], 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.get(index);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => resolve(null);
+      });
+    }
+
+    function renderImage(cell, imgData) {
+      cell.innerHTML = ''; // Clear content
+      const img = document.createElement('img');
+      img.src = imgData;
+      cell.appendChild(img);
+    }
+
+    function checkComplete() {
+      const cells = board.querySelectorAll('.cell');
+      let completed = 0;
+      cells.forEach(cell => {
+        if (cell.querySelector('img')) completed++;
+      });
+      if (completed === cellCount) {
+        downloadBtn.style.display = 'block';
+      }
+    }
+
+    downloadBtn.onclick = async () => {
+      const canvas = document.getElementById('canvas');
+      const size = 1000;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      const cellSize = size / 5;
+      for (let i = 0; i < cellCount; i++) {
+        const x = (i % 5) * cellSize;
+        const y = Math.floor(i / 5) * cellSize;
+        const imgData = await loadImage(i);
+        if (imgData) {
+          const img = new Image();
+          img.src = imgData;
+          await new Promise(res => {
+            img.onload = () => {
+              ctx.drawImage(img, x, y, cellSize, cellSize);
+              res();
+            };
+          });
+        } else {
+          ctx.fillStyle = '#eee';
+          ctx.fillRect(x, y, cellSize, cellSize);
+          ctx.fillStyle = '#000';
+          ctx.fillText(`Challenge ${i + 1}`, x + 10, y + 20);
+        }
+      }
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'bingo_board.png';
+      link.click();
+    };
+  </script>
+</body>
+</html>
