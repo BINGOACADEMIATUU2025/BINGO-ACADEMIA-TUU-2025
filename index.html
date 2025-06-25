@@ -118,8 +118,8 @@
 
     /* Special styling for the FREE space to prevent logo stretching */
     #free-cell img {
-      max-width: 110%;
-      max-height: 110%;
+      max-width: 80%;
+      max-height: 80%;
       object-fit: scale-down;
     }
 
@@ -134,7 +134,11 @@
       cursor: pointer;
       position: absolute;
       z-index: 2;
-      display: block;
+      display: none; /* Hidden by default */
+    }
+
+    .cell.show-remove .remove-btn {
+      display: block; /* Show when cell has show-remove class */
     }
 
     .challenge-text {
@@ -358,6 +362,7 @@
     let db;
     let currentCellIndex = null;
     let stream = null;
+    let clickTimeout = null;
 
     function openDB() {
       return new Promise((resolve, reject) => {
@@ -458,6 +463,28 @@
       }
     }
 
+    function handleCellClick(index, hasImage, event) {
+      // If clicking on the remove button, let it work normally
+      if (event.target.classList.contains('remove-btn')) {
+        return;
+      }
+
+      // If cell has an image, toggle remove button
+      if (hasImage) {
+        event.currentTarget.classList.toggle('show-remove');
+        
+        // Hide remove button after 3 seconds if not clicked
+        clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+          event.currentTarget.classList.remove('show-remove');
+        }, 3000);
+      } 
+      // If cell is empty, show options menu
+      else {
+        showOptionsMenu(index);
+      }
+    }
+
     async function renderBoard() {
       board.innerHTML = '';
       for (let i = 0; i < challenges.length; i++) {
@@ -488,6 +515,9 @@
               deleteImage(i);
             };
             cell.appendChild(removeBtn);
+
+            // Click handler for cells with images
+            cell.onclick = (e) => handleCellClick(i, true, e);
           } else {
             const label = document.createElement('div');
             label.className = 'challenge-text';
@@ -506,13 +536,8 @@
               }
             };
 
-            // Make the whole cell clickable for upload options
-            cell.onclick = (e) => {
-              if (e.target === cell || e.target === label) {
-                showOptionsMenu(i);
-              }
-            };
-
+            // Click handler for empty cells
+            cell.onclick = (e) => handleCellClick(i, false, e);
             cell.appendChild(input);
           }
         }
@@ -529,8 +554,22 @@
     captureBtn.onclick = capturePhoto;
     closeCamera.onclick = closeCameraPreview;
 
+    // Hide remove buttons when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.cell.show-remove')) {
+        document.querySelectorAll('.cell.show-remove').forEach(cell => {
+          cell.classList.remove('show-remove');
+        });
+      }
+    });
+
     downloadBtn.addEventListener('click', () => {
-      document.querySelectorAll('.remove-btn, #download-btn').forEach(el => {
+      // Hide all remove buttons before capturing
+      document.querySelectorAll('.cell.show-remove').forEach(cell => {
+        cell.classList.remove('show-remove');
+      });
+      
+      document.querySelectorAll('#download-btn').forEach(el => {
         el.classList.add('hide-temp');
       });
 
@@ -544,7 +583,7 @@
         link.href = canvas.toDataURL('image/png');
         link.click();
 
-        document.querySelectorAll('.remove-btn, #download-btn').forEach(el => {
+        document.querySelectorAll('#download-btn').forEach(el => {
           el.classList.remove('hide-temp');
         });
       });
