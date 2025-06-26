@@ -267,17 +267,18 @@
         }, 3000);
       } else {
         currentCellIndex = index;
-        
-        // Create a new file input element each time
+
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        
-        // On mobile devices, add capture attribute to show camera option
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          input.capture = 'environment'; // Use 'user' for front camera
+
+        // Set camera capture attribute depending on the platform
+        if (/Android/i.test(navigator.userAgent)) {
+          input.setAttribute('capture', 'environment');
+        } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          input.setAttribute('capture', 'camera');
         }
-        
+
         input.onchange = (e) => {
           const file = e.target.files[0];
           if (file && currentCellIndex !== null) {
@@ -286,8 +287,7 @@
             reader.readAsDataURL(file);
           }
         };
-        
-        // Trigger the file input click
+
         input.click();
       }
     }
@@ -297,7 +297,7 @@
       for (let i = 0; i < challenges.length; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
-        
+
         if (i === 12) {
           cell.id = 'free-cell';
         }
@@ -350,7 +350,7 @@
       document.querySelectorAll('.cell.show-remove').forEach(cell => {
         cell.classList.remove('show-remove');
       });
-      
+
       document.querySelectorAll('#download-btn').forEach(el => {
         el.classList.add('hide-temp');
       });
@@ -375,3 +375,4 @@
   </script>
 </body>
 </html>
+
