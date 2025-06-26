@@ -14,7 +14,7 @@
       font-weight: bold;
     }
 
-    /* Splash screen styles */
+    /* Splash screen styles - iOS compatible */
     #splash-screen {
       position: fixed;
       top: 0;
@@ -26,18 +26,28 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
+      -webkit-backface-visibility: hidden;
+      -webkit-perspective: 1000;
+      -webkit-transform: translate3d(0,0,0);
     }
     
     #splash-logo {
       width: 150px;
       height: 150px;
       animation: pulse 1s ease-in-out;
+      -webkit-animation: pulse 1s ease-in-out;
     }
     
     @keyframes pulse {
       0% { transform: scale(0.9); opacity: 0.7; }
       50% { transform: scale(1.1); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @-webkit-keyframes pulse {
+      0% { -webkit-transform: scale(0.9); opacity: 0.7; }
+      50% { -webkit-transform: scale(1.1); opacity: 1; }
+      100% { -webkit-transform: scale(1); opacity: 1; }
     }
 
     body {
@@ -56,12 +66,12 @@
     h1 {
       color: #ffc400;
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       font-size: 1.5em;
     }
 
     #download-btn {
-      margin-top: 20px;
+      margin-bottom: 20px;
       background: #ffc400;
       color: black;
       padding: 10px 20px;
@@ -72,9 +82,9 @@
     }
 
     #install-btn {
-      margin-top: 10px;
-      background: #FFFFFF;
-      color: #ffc400;
+      margin-top: 20px;
+      background: #ffc400;
+      color: black; /* Changed from yellow to black */
       padding: 10px 20px;
       border: none;
       font-size: 1em;
@@ -244,6 +254,8 @@
 
   <h1>Desafio Gamificação Academia TUU 2025</h1>
 
+  <button id="download-btn">DOWNLOAD</button>
+
   <div class="board-wrapper">
     <div class="bingo-header">
       <div class="letter-cell">B</div>
@@ -255,7 +267,6 @@
     <div class="board" id="board"></div>
   </div>
 
-  <button id="download-btn">DOWNLOAD</button>
   <button id="install-btn">INSTALAR APLICAÇÃO</button>
 
   <!-- Photo source selection dialog -->
@@ -309,10 +320,15 @@
     let currentCellIndex = null;
     let clickTimeout = null;
 
-    // Hide splash screen after 1 second
-    setTimeout(() => {
-      splashScreen.style.display = 'none';
-    }, 1000);
+    // Hide splash screen after 1 second (iOS compatible)
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+        }, 300);
+      }, 1000);
+    });
 
     // PWA install prompt event
     let deferredPrompt;
