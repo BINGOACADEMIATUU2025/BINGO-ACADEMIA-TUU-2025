@@ -283,18 +283,20 @@
           event.currentTarget.classList.remove('show-remove');
         }, 3000);
       } else {
-        // For empty cells, store the current index and trigger the appropriate input
+        // For empty cells, store the current index
         currentCellIndex = index;
         
-        // On mobile, show native action sheet for camera/gallery selection
+        // On mobile, prioritize camera but fall back to gallery
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          if (confirm("Escolher foto da galeria ou tirar nova foto?\n(Cancelar para Galeria, OK para Câmera)")) {
+          try {
+            // First try to open camera directly
             cameraInput.click();
-          } else {
+          } catch (e) {
+            // If camera fails, open gallery
             galleryInput.click();
           }
         } else {
-          // On desktop, just open file dialog
+          // On desktop, open file dialog
           galleryInput.click();
         }
       }
@@ -309,7 +311,6 @@
           reader.onload = () => saveImage(currentCellIndex, reader.result);
           reader.readAsDataURL(file);
         }
-        // Reset the input
         cameraInput.value = '';
       };
 
@@ -321,7 +322,6 @@
           reader.onload = () => saveImage(currentCellIndex, reader.result);
           reader.readAsDataURL(file);
         }
-        // Reset the input
         galleryInput.value = '';
       };
     }
@@ -412,9 +412,6 @@
     // Initialize
     setupFileInputs();
     openDB().then(renderBoard);
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
