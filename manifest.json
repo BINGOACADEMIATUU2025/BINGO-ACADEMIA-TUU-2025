@@ -1,11 +1,6 @@
 {
-  "name": "Academia TUU 2025",
-  "short_name": "TUU 2025",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#ffc400",
-  "orientation": "portrait",
+  "short_name": "Academia TUU",
+  "name": "Desafio Gamificação Academia TUU 2025",
   "icons": [
     {
       "src": "logo.png",
@@ -17,5 +12,9 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
 }
