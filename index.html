@@ -116,7 +116,6 @@
       border-radius: 5px;
     }
 
-    /* Special styling for the FREE space to prevent logo stretching */
     #free-cell img {
       max-width: 110%;
       max-height: 110%;
@@ -160,11 +159,6 @@
     .hide-temp {
       display: none !important;
     }
-
-    /* Hidden file inputs */
-    .file-inputs {
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -181,11 +175,6 @@
     <div class="board" id="board"></div>
   </div>
 
-  <div class="file-inputs">
-    <!-- Combined input that allows both camera and gallery -->
-    <input type="file" id="imageInput" accept="image/*" capture>
-  </div>
-
   <button id="download-btn">DOWNLOAD</button>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -193,7 +182,6 @@
     const FREE_IMAGE = 'logo.png';
     const board = document.getElementById('board');
     const downloadBtn = document.getElementById('download-btn');
-    const imageInput = document.getElementById('imageInput');
 
     const challenges = [
       "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
@@ -267,40 +255,41 @@
     }
 
     function handleCellClick(index, hasImage, event) {
-      // If clicking on the remove button, let it work normally
       if (event.target.classList.contains('remove-btn')) {
         return;
       }
 
-      // If cell has an image, toggle remove button
       if (hasImage) {
         event.currentTarget.classList.toggle('show-remove');
-        
-        // Hide remove button after 3 seconds if not clicked
         clearTimeout(clickTimeout);
         clickTimeout = setTimeout(() => {
           event.currentTarget.classList.remove('show-remove');
         }, 3000);
       } else {
-        // For empty cells, store the current index
         currentCellIndex = index;
         
-        // Trigger the file input which will show system picker
-        imageInput.click();
-      }
-    }
-
-    function setupFileInput() {
-      // Combined image input handler
-      imageInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file && currentCellIndex !== null) {
-          const reader = new FileReader();
-          reader.onload = () => saveImage(currentCellIndex, reader.result);
-          reader.readAsDataURL(file);
+        // Create a new file input element each time
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        
+        // On mobile devices, add capture attribute to show camera option
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          input.capture = 'environment'; // Use 'user' for front camera
         }
-        imageInput.value = '';
-      };
+        
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file && currentCellIndex !== null) {
+            const reader = new FileReader();
+            reader.onload = () => saveImage(currentCellIndex, reader.result);
+            reader.readAsDataURL(file);
+          }
+        };
+        
+        // Trigger the file input click
+        input.click();
+      }
     }
 
     async function renderBoard() {
@@ -334,7 +323,6 @@
             };
             cell.appendChild(removeBtn);
 
-            // Click handler for cells with images
             cell.onclick = (e) => handleCellClick(i, true, e);
           } else {
             const label = document.createElement('div');
@@ -342,7 +330,6 @@
             label.textContent = challenges[i];
             cell.appendChild(label);
 
-            // Click handler for empty cells
             cell.onclick = (e) => handleCellClick(i, false, e);
           }
         }
@@ -351,7 +338,6 @@
       }
     }
 
-    // Hide remove buttons when clicking outside
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.cell.show-remove')) {
         document.querySelectorAll('.cell.show-remove').forEach(cell => {
@@ -361,7 +347,6 @@
     });
 
     downloadBtn.addEventListener('click', () => {
-      // Hide all remove buttons before capturing
       document.querySelectorAll('.cell.show-remove').forEach(cell => {
         cell.classList.remove('show-remove');
       });
@@ -386,8 +371,6 @@
       });
     });
 
-    // Initialize
-    setupFileInput();
     openDB().then(renderBoard);
   </script>
 </body>
