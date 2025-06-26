@@ -1,20 +1,7 @@
-self.addEventListener('install', function (e) {
-  e.waitUntil(
-    caches.open('tuu-cache').then(function (cache) {
-      return cache.addAll([
-        './',
-        './index.html',
-        './logo.png',
-        './manifest.json'
-      ]);
-    })
-  );
-});
-
-self.addEventListener('fetch', function (e) {
-  e.respondWith(
-    caches.match(e.request).then(function (response) {
-      return response || fetch(e.request);
-    })
-  );
-});
+const CACHE_NAME = 'bingo-cache-v1';
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './logo.png',
+  'https://cdn.jsdelivr.net/npm/html2
