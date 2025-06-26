@@ -174,6 +174,40 @@
     .hide-temp {
       display: none !important;
     }
+
+    /* Photo source selection dialog */
+    .photo-source-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .photo-source-btn {
+      background: #ffc400;
+      color: black;
+      padding: 15px 30px;
+      border: none;
+      font-size: 1.2em;
+      margin: 10px;
+      width: 80%;
+      max-width: 300px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .photo-source-cancel {
+      background: #333;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -193,12 +227,23 @@
   <button id="download-btn">DOWNLOAD</button>
   <button id="install-btn">INSTALAR APLICATIVO</button>
 
+  <!-- Photo source selection dialog -->
+  <div id="photoSourceDialog" class="photo-source-dialog" style="display: none;">
+    <button id="cameraBtn" class="photo-source-btn">TIRAR FOTO</button>
+    <button id="galleryBtn" class="photo-source-btn">ESCOLHER DA GALERIA</button>
+    <button id="cancelPhotoBtn" class="photo-source-btn photo-source-cancel">CANCELAR</button>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     const FREE_IMAGE = 'logo.png';
     const board = document.getElementById('board');
     const downloadBtn = document.getElementById('download-btn');
     const installBtn = document.getElementById('install-btn');
+    const photoSourceDialog = document.getElementById('photoSourceDialog');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const cancelPhotoBtn = document.getElementById('cancelPhotoBtn');
 
     const challenges = [
       "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
@@ -307,31 +352,68 @@
           event.currentTarget.classList.remove('show-remove');
         }, 3000);
       } else {
-        currentCellIndex = index;
+        showPhotoSourceDialog(index);
+      }
+    }
 
-        // Create a new file input element each time
+    function showPhotoSourceDialog(index) {
+      currentCellIndex = index;
+      photoSourceDialog.style.display = 'flex';
+    }
+
+    function hidePhotoSourceDialog() {
+      photoSourceDialog.style.display = 'none';
+      currentCellIndex = null;
+    }
+
+    function createFileInput(accept, capture = null) {
+      return new Promise((resolve) => {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = 'image/*';
-
-        // On mobile devices, add capture attribute to show camera option
-        // Note: For iOS Safari, capture='environment' or 'user' allows camera
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          input.capture = 'environment';
+        input.accept = accept;
+        
+        if (capture) {
+          input.capture = capture;
         }
 
         input.onchange = (e) => {
           const file = e.target.files[0];
           if (file && currentCellIndex !== null) {
             const reader = new FileReader();
-            reader.onload = () => saveImage(currentCellIndex, reader.result);
+            reader.onload = () => {
+              saveImage(currentCellIndex, reader.result);
+              hidePhotoSourceDialog();
+            };
             reader.readAsDataURL(file);
+          } else {
+            hidePhotoSourceDialog();
           }
         };
 
+        // For iOS, we need to append the input to the DOM and trigger click
+        document.body.appendChild(input);
         input.click();
-      }
+        
+        // iOS doesn't always fire change event when cancelling
+        setTimeout(() => {
+          if (!input.value) {
+            hidePhotoSourceDialog();
+          }
+          document.body.removeChild(input);
+        }, 10000); // Remove after 10 seconds if nothing happens
+      });
     }
+
+    // Event listeners for photo source buttons
+    cameraBtn.addEventListener('click', () => {
+      createFileInput('image/*', 'environment');
+    });
+
+    galleryBtn.addEventListener('click', () => {
+      createFileInput('image/*');
+    });
+
+    cancelPhotoBtn.addEventListener('click', hidePhotoSourceDialog);
 
     async function renderBoard() {
       board.innerHTML = '';
@@ -380,7 +462,7 @@
     }
 
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.cell.show-remove')) {
+      if (!e.target.closest('.cell.show-remove') && !e.target.closest('.photo-source-dialog')) {
         document.querySelectorAll('.cell.show-remove').forEach(cell => {
           cell.classList.remove('show-remove');
         });
@@ -423,7 +505,6 @@
 
     // iOS install instructions
     if (navigator.userAgent.match(/(iPhone|iPad|iPod)/i)) {
-      // Mostrar um alerta/instrução para o usuário instalar manualmente
       const isStandalone = window.navigator.standalone === true;
       if (!isStandalone) {
         const installAlert = document.createElement('div');
