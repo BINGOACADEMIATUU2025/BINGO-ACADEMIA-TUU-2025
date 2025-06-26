@@ -14,7 +14,7 @@
       font-weight: bold;
     }
 
-    /* Splash screen styles - iOS compatible */
+    /* Extended splash screen (2 seconds) */
     #splash-screen {
       position: fixed;
       top: 0;
@@ -34,8 +34,8 @@
     #splash-logo {
       width: 150px;
       height: 150px;
-      animation: pulse 1s ease-in-out;
-      -webkit-animation: pulse 1s ease-in-out;
+      animation: pulse 2s ease-in-out;
+      -webkit-animation: pulse 2s ease-in-out;
     }
     
     @keyframes pulse {
@@ -320,7 +320,7 @@
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
+  <!-- Splash Screen (now lasts 2 seconds) -->
   <div id="splash-screen">
     <img id="splash-logo" src="logo.png" alt="Academia TUU Logo">
   </div>
@@ -407,7 +407,6 @@
     // Theme toggle functionality
     themeToggle.addEventListener('click', () => {
       document.body.classList.toggle('light-mode');
-      // Save preference to localStorage
       const isLightMode = document.body.classList.contains('light-mode');
       localStorage.setItem('lightMode', isLightMode);
     });
@@ -417,17 +416,17 @@
       document.body.classList.add('light-mode');
     }
 
-    // Hide splash screen after 1 second (iOS compatible)
+    // Extended splash screen (2 seconds)
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         splashScreen.style.opacity = '0';
         setTimeout(() => {
           splashScreen.style.display = 'none';
         }, 300);
-      }, 1000);
+      }, 2000); // Changed from 1000 to 2000 for 2-second duration
     });
 
-    // [Rest of your existing JavaScript code remains the same...]
+    // [Rest of your JavaScript implementation remains the same]
     // PWA install prompt event
     let deferredPrompt;
 
@@ -645,10 +644,10 @@
       });
     });
 
-    // Start the app after splash screen
+    // Start the app after extended splash screen (2 seconds)
     setTimeout(() => {
       openDB().then(renderBoard);
-    }, 1000);
+    }, 2000); // Changed from 1000 to 2000
 
     // Register service worker
     if ('serviceWorker' in navigator) {
@@ -678,7 +677,7 @@
           setTimeout(() => {
             installAlert.style.display = 'none';
           }, 15000);
-        }, 1000); // Show after splash screen
+        }, 2000); // Show after extended splash screen
       }
     }
   </script>
