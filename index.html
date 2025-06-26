@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Desafio Gamificação Academia TUU 2025</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="logo.png" type="image/png" />
+  <meta name="theme-color" content="#000000" />
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('✔ Service Worker registado com sucesso!'))
+        .catch(err => console.error('⚠ Falha ao registar Service Worker:', err));
+    }
+  </script>
+
   <style>
     @font-face {
       font-family: 'DINBlack';
@@ -255,7 +267,9 @@
     }
 
     function handleCellClick(index, hasImage, event) {
-      if (event.target.classList.contains('remove-btn')) return;
+      if (event.target.classList.contains('remove-btn')) {
+        return;
+      }
 
       if (hasImage) {
         event.currentTarget.classList.toggle('show-remove');
@@ -265,11 +279,12 @@
         }, 3000);
       } else {
         currentCellIndex = index;
-
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        // Sem capture para permitir escolher da galeria ou tirar foto
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          input.capture = 'environment';
+        }
         input.onchange = (e) => {
           const file = e.target.files[0];
           if (file && currentCellIndex !== null) {
@@ -287,6 +302,7 @@
       for (let i = 0; i < challenges.length; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
+
         if (i === 12) cell.id = 'free-cell';
 
         if (challenges[i] === "FREE") {
@@ -309,7 +325,6 @@
               deleteImage(i);
             };
             cell.appendChild(removeBtn);
-
             cell.onclick = (e) => handleCellClick(i, true, e);
           } else {
             const label = document.createElement('div');
@@ -319,6 +334,7 @@
             cell.onclick = (e) => handleCellClick(i, false, e);
           }
         }
+
         board.appendChild(cell);
       }
     }
@@ -335,9 +351,11 @@
       document.querySelectorAll('.cell.show-remove').forEach(cell => {
         cell.classList.remove('show-remove');
       });
+
       document.querySelectorAll('#download-btn').forEach(el => {
         el.classList.add('hide-temp');
       });
+
       html2canvas(document.querySelector('.board-wrapper'), {
         allowTaint: true,
         useCORS: true,
@@ -347,6 +365,7 @@
         link.download = 'bingo_academia_tuu_2025.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
+
         document.querySelectorAll('#download-btn').forEach(el => {
           el.classList.remove('hide-temp');
         });
@@ -354,6 +373,10 @@
     });
 
     openDB().then(renderBoard);
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
