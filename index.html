@@ -182,8 +182,8 @@
   </div>
 
   <div class="file-inputs">
-    <input type="file" id="cameraInput" accept="image/*" capture="environment">
-    <input type="file" id="galleryInput" accept="image/*">
+    <!-- Combined input that allows both camera and gallery -->
+    <input type="file" id="imageInput" accept="image/*" capture>
   </div>
 
   <button id="download-btn">DOWNLOAD</button>
@@ -193,8 +193,7 @@
     const FREE_IMAGE = 'logo.png';
     const board = document.getElementById('board');
     const downloadBtn = document.getElementById('download-btn');
-    const cameraInput = document.getElementById('cameraInput');
-    const galleryInput = document.getElementById('galleryInput');
+    const imageInput = document.getElementById('imageInput');
 
     const challenges = [
       "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
@@ -286,43 +285,21 @@
         // For empty cells, store the current index
         currentCellIndex = index;
         
-        // On mobile, prioritize camera but fall back to gallery
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          try {
-            // First try to open camera directly
-            cameraInput.click();
-          } catch (e) {
-            // If camera fails, open gallery
-            galleryInput.click();
-          }
-        } else {
-          // On desktop, open file dialog
-          galleryInput.click();
-        }
+        // Trigger the file input which will show system picker
+        imageInput.click();
       }
     }
 
-    function setupFileInputs() {
-      // Camera input handler
-      cameraInput.onchange = (e) => {
+    function setupFileInput() {
+      // Combined image input handler
+      imageInput.onchange = (e) => {
         const file = e.target.files[0];
         if (file && currentCellIndex !== null) {
           const reader = new FileReader();
           reader.onload = () => saveImage(currentCellIndex, reader.result);
           reader.readAsDataURL(file);
         }
-        cameraInput.value = '';
-      };
-
-      // Gallery input handler
-      galleryInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file && currentCellIndex !== null) {
-          const reader = new FileReader();
-          reader.onload = () => saveImage(currentCellIndex, reader.result);
-          reader.readAsDataURL(file);
-        }
-        galleryInput.value = '';
+        imageInput.value = '';
       };
     }
 
@@ -410,8 +387,11 @@
     });
 
     // Initialize
-    setupFileInputs();
+    setupFileInput();
     openDB().then(renderBoard);
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
