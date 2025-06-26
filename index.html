@@ -14,7 +14,7 @@
       font-weight: bold;
     }
 
-    /* Extended splash screen */
+    /* Extended splash screen (2 seconds) */
     #splash-screen {
       position: fixed;
       top: 0;
@@ -26,12 +26,16 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
+      -webkit-backface-visibility: hidden;
+      -webkit-perspective: 1000;
+      -webkit-transform: translate3d(0,0,0);
     }
     
     #splash-logo {
       width: 150px;
       height: 150px;
       animation: pulse 2s ease-in-out;
+      -webkit-animation: pulse 2s ease-in-out;
     }
     
     @keyframes pulse {
@@ -39,8 +43,14 @@
       50% { transform: scale(1.1); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
     }
+    
+    @-webkit-keyframes pulse {
+      0% { -webkit-transform: scale(0.9); opacity: 0.7; }
+      50% { -webkit-transform: scale(1.1); opacity: 1; }
+      100% { -webkit-transform: scale(1); opacity: 1; }
+    }
 
-    /* Theme toggle button */
+    /* Dark/Light mode toggle button */
     #theme-toggle {
       position: fixed;
       bottom: 20px;
@@ -63,12 +73,22 @@
       height: 24px;
     }
     
-    #theme-toggle .sun-icon { display: none; }
-    #theme-toggle .moon-icon { display: block; }
-    .light-mode #theme-toggle .sun-icon { display: block; }
-    .light-mode #theme-toggle .moon-icon { display: none; }
+    #theme-toggle .sun-icon {
+      display: none;
+    }
+    
+    #theme-toggle .moon-icon {
+      display: block;
+    }
+    
+    .light-mode #theme-toggle .sun-icon {
+      display: block;
+    }
+    
+    .light-mode #theme-toggle .moon-icon {
+      display: none;
+    }
 
-    /* Main body styles */
     body {
       margin: 0;
       font-family: 'DINBlack', sans-serif;
@@ -78,16 +98,39 @@
       flex-direction: column;
       align-items: center;
       padding: 10px;
+      -webkit-text-size-adjust: 100%;
       min-height: 100vh;
       transition: background-color 0.3s, color 0.3s;
     }
 
-    .light-mode {
+    /* Light mode styles */
+    body.light-mode {
       background-color: white;
       color: black;
     }
     
-    /* Title styles - always centered and #ffc400 */
+    body.light-mode .cell {
+      background: #000;
+      color: white;
+      border-color: #ffc400;
+    }
+    
+    body.light-mode .challenge-text {
+      color: white;
+      font-weight: 900;
+    }
+    
+    body.light-mode .letter-cell {
+      color: black;
+      font-weight: 900;
+    }
+    
+    body.light-mode #install-btn {
+      background: #000;
+      color: #ffc400;
+    }
+
+    /* Updated Title Styles */
     .title-container {
       width: 100%;
       display: flex;
@@ -96,20 +139,21 @@
     }
     
     h1 {
-      color: #ffc400;
+      color: #ffc400; /* Always stays #ffc400 */
       text-align: center;
+      margin: 0;
       font-size: 1.5em;
-      max-width: 500px;
       width: 100%;
+      max-width: 500px;
       padding: 0 20px;
       box-sizing: border-box;
     }
 
-    /* PRINTSCREEN button styles */
+    /* Updated PRINTSCREEN button styles */
     #download-btn {
       margin-bottom: 20px;
       background: #ffc400;
-      color: white;
+      color: white; /* White text in dark mode */
       padding: 10px 20px;
       border: none;
       font-size: 1em;
@@ -119,11 +163,22 @@
       transition: color 0.3s;
     }
     
-    .light-mode #download-btn {
-      color: black;
+    body.light-mode #download-btn {
+      color: black; /* Black text in light mode */
     }
 
-    /* Board styles */
+    #install-btn {
+      margin-top: 20px;
+      background: #ffc400;
+      color: black;
+      padding: 10px 20px;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      display: none;
+    }
+
     .board-wrapper {
       display: flex;
       flex-direction: column;
@@ -178,14 +233,112 @@
       overflow: hidden;
       padding: 2px;
       box-sizing: border-box;
+      word-break: break-word;
+      hyphens: auto;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    @media (max-width: 480px) {
+      .cell {
+        font-size: 0.55em;
+        padding: 1px;
+      }
+      .challenge-text {
+        font-size: 0.9em;
+      }
+    }
+
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 5px;
+    }
+
+    #free-cell img {
+      max-width: 110%;
+      max-height: 110%;
+      object-fit: scale-down;
+    }
+
+    .remove-btn {
+      background: #ffc400;
+      color: #FFFFFF;
+      border: 1px solid #ffc400;
+      top: 5px;
+      right: 5px;
+      padding: 3px 6px;
+      font-size: 0.7em;
+      cursor: pointer;
+      position: absolute;
+      z-index: 2;
+      display: none;
+    }
+
+    .cell.show-remove .remove-btn {
+      display: block;
+    }
+
+    .challenge-text {
+      z-index: 1;
+      padding: 2px;
+      font-size: 0.75em;
+      font-weight: 700;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      line-height: 1.2;
+      transition: color 0.3s;
+    }
+
+    .hide-temp {
+      display: none !important;
+    }
+
+    /* Photo source selection dialog */
+    .photo-source-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .photo-source-btn {
+      background: #ffc400;
+      color: black;
+      padding: 15px 30px;
+      border: none;
+      font-size: 1.2em;
+      margin: 10px;
+      width: 80%;
+      max-width: 300px;
+      border-radius: 5px;
       cursor: pointer;
     }
 
-    /* Rest of your existing styles... */
+    .photo-source-cancel {
+      background: #333;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
+  <!-- Splash Screen (now lasts 2 seconds) -->
   <div id="splash-screen">
     <img id="splash-logo" src="logo.png" alt="Academia TUU Logo">
   </div>
@@ -229,13 +382,268 @@
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    // Your existing JavaScript with updated screenshot function
+    const FREE_IMAGE = 'logo.png';
+    const board = document.getElementById('board');
+    const downloadBtn = document.getElementById('download-btn');
+    const installBtn = document.getElementById('install-btn');
+    const photoSourceDialog = document.getElementById('photoSourceDialog');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const cancelPhotoBtn = document.getElementById('cancelPhotoBtn');
+    const splashScreen = document.getElementById('splash-screen');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    const challenges = [
+      "FOTO C/ ALOUÉM COM A CAMISOLA DA ACADÉMICA.",
+      "FOTO C/ LONA DE OBRA DA TUU.",
+      "TROCAR DE NOMES COM UM PARTICIPANTE DURANTE UMA HORA.",
+      "STORY A IDENTIFICAR A ACADEMIA.",
+      "VISITAR 3 MARCOS TURÍSTICOS DA CIDADE.",
+      "FAZER UM ELOGIO A UM DESCONHECIDO.",
+      "OFERECER ALGO FEITO À MÃO A ALGUÉM.",
+      "FOTO C/ MAIS DE 30 PESSOAS.",
+      "JOGAR PEDRA PAPEL TESOURA COM UM DESCONHECIDO.",
+      "ENTREVISTAR UM TUU SOBRE COMO É TRABALHAR NA TUU.",
+      "DESENHAR UM EDIFICIO QUE TENHA CHAMADO À ATENÇÃO.",
+      "APRESENTAR UM POWERPOINT FEITO POR OUTRA PESSOA.",
+      "FREE",
+      "ESCREVER UMA CARTA COM ESPECTATIVAS PARA A ACADEMIA.",
+      "ENCONTRAR UM PARTICIPANTE QUE FALE MAIS QUE 2 LINGUAS.",
+      "FOTO C/UM TUU.",
+      "INVENTAR UM JINGLE PARA A ACADEMIA.",
+      "IMITAR O BARULHO DE UM BERBEQUIM.",
+      "TROCAR UMA LEMBRANÇA COM OUTRO PARTICIPANTE.",
+      "FOTO C/UMA ESCAVADORA.",
+      "NÃO FALAR DURANTE 15 MINUTOS.",
+      "ENCONTRAR UM PARTICIPANTE QUE TENHA UMA TATUAGEM.",
+      "FOTO C/UMA OBRA DA TUU TERMINADA.",
+      "FAZER UMA PERGUNTA A UM DRADOR CRIAR UMA ALCUNHA PARA OUTRO PARTICIPANTE.",
+      "MOSTRAR UMA HABILIDADE OCULTA A UM TUU."
+    ];
+
+    let db;
+    let currentCellIndex = null;
+    let clickTimeout = null;
+
+    // Theme toggle functionality
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      const isLightMode = document.body.classList.contains('light-mode');
+      localStorage.setItem('lightMode', isLightMode);
+    });
+
+    // Check for saved theme preference
+    if (localStorage.getItem('lightMode') === 'true') {
+      document.body.classList.add('light-mode');
+    }
+
+    // Extended splash screen (2 seconds)
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+        }, 300);
+      }, 2000);
+    });
+
+    // PWA install prompt event
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('Usuário aceitou instalar a app');
+        } else {
+          console.log('Usuário recusou instalar a app');
+        }
+        deferredPrompt = null;
+      }
+    });
+
+    // IndexedDB functions
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('BingoDB', 1);
+        request.onupgradeneeded = (e) => {
+          db = e.target.result;
+          db.createObjectStore('images');
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve();
+        };
+        request.onerror = reject;
+      });
+    }
+
+    function saveImage(index, dataUrl) {
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.put(dataUrl, index);
+      tx.oncomplete = renderBoard;
+    }
+
+    function getImage(index) {
+      return new Promise((resolve) => {
+        const tx = db.transaction('images', 'readonly');
+        const store = tx.objectStore('images');
+        const req = store.get(index);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    function deleteImage(index) {
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.delete(index);
+      tx.oncomplete = renderBoard;
+    }
+
+    function handleCellClick(index, hasImage, event) {
+      if (event.target.classList.contains('remove-btn')) {
+        return;
+      }
+
+      if (hasImage) {
+        event.currentTarget.classList.toggle('show-remove');
+        clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+          event.currentTarget.classList.remove('show-remove');
+        }, 3000);
+      } else {
+        showPhotoSourceDialog(index);
+      }
+    }
+
+    function showPhotoSourceDialog(index) {
+      currentCellIndex = index;
+      photoSourceDialog.style.display = 'flex';
+    }
+
+    function hidePhotoSourceDialog() {
+      photoSourceDialog.style.display = 'none';
+      currentCellIndex = null;
+    }
+
+    function createFileInput(accept, capture = null) {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = accept;
+        
+        if (capture) {
+          input.capture = capture;
+        }
+
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file && currentCellIndex !== null) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              saveImage(currentCellIndex, reader.result);
+              hidePhotoSourceDialog();
+            };
+            reader.readAsDataURL(file);
+          } else {
+            hidePhotoSourceDialog();
+          }
+        };
+
+        document.body.appendChild(input);
+        input.click();
+        
+        setTimeout(() => {
+          if (!input.value) {
+            hidePhotoSourceDialog();
+          }
+          document.body.removeChild(input);
+        }, 10000);
+      });
+    }
+
+    // Event listeners for photo source buttons
+    cameraBtn.addEventListener('click', () => {
+      createFileInput('image/*', 'environment');
+    });
+
+    galleryBtn.addEventListener('click', () => {
+      createFileInput('image/*');
+    });
+
+    cancelPhotoBtn.addEventListener('click', hidePhotoSourceDialog);
+
+    async function renderBoard() {
+      board.innerHTML = '';
+      for (let i = 0; i < challenges.length; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+
+        if (i === 12) {
+          cell.id = 'free-cell';
+        }
+
+        if (challenges[i] === "FREE") {
+          const img = document.createElement('img');
+          img.src = FREE_IMAGE;
+          img.alt = "Free Space";
+          cell.appendChild(img);
+        } else {
+          const imgData = await getImage(i);
+          if (imgData) {
+            const img = document.createElement('img');
+            img.src = imgData;
+            cell.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = 'Remover';
+            removeBtn.onclick = (e) => {
+              e.stopPropagation();
+              deleteImage(i);
+            };
+            cell.appendChild(removeBtn);
+
+            cell.onclick = (e) => handleCellClick(i, true, e);
+          } else {
+            const label = document.createElement('div');
+            label.className = 'challenge-text';
+            label.textContent = challenges[i];
+            cell.appendChild(label);
+
+            cell.onclick = (e) => handleCellClick(i, false, e);
+          }
+        }
+
+        board.appendChild(cell);
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.cell.show-remove') && !e.target.closest('.photo-source-dialog')) {
+        document.querySelectorAll('.cell.show-remove').forEach(cell => {
+          cell.classList.remove('show-remove');
+        });
+      }
+    });
+
+    // Updated PRINTSCREEN function with high quality output
     downloadBtn.addEventListener('click', () => {
       document.querySelectorAll('.cell.show-remove').forEach(cell => {
         cell.classList.remove('show-remove');
       });
 
-      // Hide buttons temporarily for screenshot
+      // Hide buttons temporarily
       document.querySelectorAll('#download-btn, #install-btn, #theme-toggle').forEach(el => {
         el.style.visibility = 'hidden';
       });
@@ -248,7 +656,6 @@
         allowTaint: true,
         backgroundColor: document.body.classList.contains('light-mode') ? '#ffffff' : '#000000',
         onclone: (clonedDoc) => {
-          // Ensure cloned document has correct styles
           if (document.body.classList.contains('light-mode')) {
             clonedDoc.body.classList.add('light-mode');
           }
@@ -259,7 +666,7 @@
         const ctx = tempCanvas.getContext('2d');
         
         // Set dimensions maintaining aspect ratio
-        const maxWidth = 1500; // Maximum width for output
+        const maxWidth = 1500;
         const ratio = Math.min(maxWidth / canvas.width, 1);
         tempCanvas.width = canvas.width * ratio;
         tempCanvas.height = canvas.height * ratio;
@@ -272,7 +679,7 @@
         // Download the image
         const link = document.createElement('a');
         link.download = 'bingo_academia_tuu_2025.png';
-        link.href = tempCanvas.toDataURL('image/png', 1.0); // Highest quality
+        link.href = tempCanvas.toDataURL('image/png', 1.0);
         link.click();
 
         // Restore buttons
@@ -282,7 +689,42 @@
       });
     });
 
-    // Rest of your existing JavaScript...
+    // Start the app after extended splash screen (2 seconds)
+    setTimeout(() => {
+      openDB().then(renderBoard);
+    }, 2000);
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registrado'))
+        .catch(err => console.error('Erro no SW:', err));
+    }
+
+    // iOS install instructions
+    if (navigator.userAgent.match(/(iPhone|iPad|iPod)/i)) {
+      const isStandalone = window.navigator.standalone === true;
+      if (!isStandalone) {
+        setTimeout(() => {
+          const installAlert = document.createElement('div');
+          installAlert.style.position = 'fixed';
+          installAlert.style.bottom = '0';
+          installAlert.style.background = '#ffc400';
+          installAlert.style.color = '#000';
+          installAlert.style.padding = '10px';
+          installAlert.style.textAlign = 'center';
+          installAlert.style.fontWeight = 'bold';
+          installAlert.style.width = '100%';
+          installAlert.style.zIndex = '9999';
+          installAlert.textContent = 'Para instalar este app, toque no ícone de compartilhar do Safari e depois em "Adicionar à Tela de Início".';
+          document.body.appendChild(installAlert);
+
+          setTimeout(() => {
+            installAlert.style.display = 'none';
+          }, 15000);
+        }, 2000);
+      }
+    }
   </script>
 </body>
 </html>
