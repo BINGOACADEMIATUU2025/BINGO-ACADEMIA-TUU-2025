@@ -143,11 +143,70 @@
       padding: 20px;
       background: #000;
       border: 2px solid #ffc400;
+      font-family: 'DINBlack', sans-serif;
     }
     
     .light-mode #rules-content {
       background: #fff;
       border: 2px solid #000;
+      color: black;
+    }
+    
+    #rules-content h2 {
+      color: #ffc400;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    
+    #rules-content h3 {
+      color: #ffc400;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    
+    #rules-content p, #rules-content ul {
+      margin-bottom: 15px;
+      line-height: 1.5;
+      font-size: 0.9em;
+    }
+    
+    #rules-content ul {
+      padding-left: 20px;
+    }
+    
+    #rules-content li {
+      margin-bottom: 8px;
+    }
+    
+    .regulation-section {
+      margin-bottom: 20px;
+    }
+    
+    .points-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    
+    .points-table th, .points-table td {
+      border: 1px solid #ffc400;
+      padding: 8px;
+      text-align: left;
+    }
+    
+    .points-table th {
+      background-color: rgba(255, 196, 0, 0.2);
+    }
+    
+    .light-mode .points-table th, 
+    .light-mode .points-table td {
+      border-color: #000;
+    }
+    
+    .light-mode .points-table th {
+      background-color: rgba(0, 0, 0, 0.1);
     }
     
     #close-rules {
@@ -160,6 +219,7 @@
       cursor: pointer;
       border-radius: 5px;
       -webkit-appearance: none;
+      font-family: 'DINBlack', sans-serif;
     }
 
     body {
@@ -473,6 +533,86 @@
   <div id="rules-dialog">
     <div id="rules-content">
       <h2>REGULAMENTO</h2>
+      <div class="regulation-section">
+        <h3>INTRODUÇÃO</h3>
+        <p>Este ano, o desafio de gamificação da Academia TUU ganha uma nova forma: um Bingo Fotográfico. Ao longo da semana, os academistas terão de completar desafios representados nos quadrados de um cartão de bingo — e comprovar cada um com uma foto criativa. Quanto mais quadrados completares, mais pontos acumulas. E sim… há prémio para quem fizer "BINGO"!</p>
+      </div>
+      
+      <div class="regulation-section">
+        <h3>COMO FUNCIONA</h3>
+        <p>Cada participante irá receber um cartão de bingo digital com diferentes desafios a completar.</p>
+        <p>Para cada quadrado completado, deverás:</p>
+        <ul>
+          <li>Tirar uma foto como prova</li>
+          <li>Submeter a foto para validação junto da organização</li>
+        </ul>
+      </div>
+      
+      <div class="regulation-section">
+        <h3>PONTUAÇÃO</h3>
+        <table class="points-table">
+          <tr>
+            <th>Ação</th>
+            <th>Pontos</th>
+          </tr>
+          <tr>
+            <td>Cada quadrado preenchido</td>
+            <td>+10 pontos</td>
+          </tr>
+          <tr>
+            <td>Linha completa (horizontal)</td>
+            <td>+100 pontos</td>
+          </tr>
+          <tr>
+            <td>Cartão completo (bingo total)</td>
+            <td>+100 pontos</td>
+          </tr>
+          <tr>
+            <td>Desafios dos cantos – 1º lugar</td>
+            <td>+100 pontos</td>
+          </tr>
+          <tr>
+            <td>Desafios dos cantos – 2º lugar</td>
+            <td>+75 pontos</td>
+          </tr>
+          <tr>
+            <td>Desafios dos cantos – 3º lugar</td>
+            <td>+50 pontos</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="regulation-section">
+        <h3>CRITÉRIOS DE DESEMPATE</h3>
+        <p>Em caso de empate na pontuação final:</p>
+        <ol>
+          <li>Ganha quem completou o bingo completo mais cedo;</li>
+          <li>Se ainda assim houver empate, a organização pode propor um desafio final de desempate.</li>
+        </ol>
+      </div>
+      
+      <div class="regulation-section">
+        <h3>REGRAS GERAIS</h3>
+        <ul>
+          <li>Todos os academistas estão automaticamente inscritos na gamificação.</li>
+          <li>A participação é individual, salvo indicação contrária.</li>
+          <li>A equipa da TUU irá validar cada desafio e controlar a pontuação.</li>
+          <li>Qualquer tentativa de fraude implicará desclassificação imediata.</li>
+          <li>Os resultados serão anunciados durante o jantar de encerramento, no dia 24 de julho.</li>
+          <li>O jogo valerá até dia 24 as 12:00 AM.</li>
+        </ul>
+      </div>
+      
+      <div class="regulation-section">
+        <h3>PREMIAÇÃO</h3>
+        <p>Os participantes com maior pontuação receberão prémios surpresa no jantar final.</p>
+        <p>Vais precisar de atenção, criatividade, ousadia — e boa disposição para completar o teu BINGO.</p>
+        <p><strong>Atenção!</strong></p>
+        <p>Não basta marcar. Tens de provar com foto.</p>
+        <p>E não vale repetir poses. Inovação conta (e muito).</p>
+        <p>Boa sorte!</p>
+        <p>Academia TUU 2025</p>
+      </div>
     </div>
     <button id="close-rules">FECHAR</button>
   </div>
