@@ -332,7 +332,6 @@
       width: 100%;
       max-width: 500px;
       margin-bottom: 8px;
-      font-size: 24px; 
     }
 
     .letter-cell {
@@ -583,14 +582,26 @@
         </table>
       </div>
       
-      <div class="regulation-section" style="font-size: 16px; color: white; font-family: Arial, sans-serif;">
-  <h3 style="color: #FFC72C;">CRITÉRIOS DE DESEMPATE</h3>
-  <p>Em caso de empate na pontuação final:</p>
-  <ol style="padding-left: 20px; margin-top: 8px; line-height: 1.5;">
-    <li>Ganha quem completou o bingo completo mais cedo;</li>
-    <li>Se ainda assim houver empate, a organização pode propor um desafio final de desempate.</li>
-  </ol>
-</div>
+      <div class="regulation-section">
+        <h3>CRITÉRIOS DE DESEMPATE</h3>
+        <p>Em caso de empate na pontuação final:</p>
+        <ol>
+          <li>Ganha quem completou o bingo completo mais cedo;</li>
+          <li>Se ainda assim houver empate, a organização pode propor um desafio final de desempate.</li>
+        </ol>
+      </div>
+      
+      <div class="regulation-section">
+        <h3>REGRAS GERAIS</h3>
+        <ul>
+          <li>Todos os academistas estão automaticamente inscritos na gamificação.</li>
+          <li>A participação é individual, salvo indicação contrária.</li>
+          <li>A equipa da TUU irá validar cada desafio e controlar a pontuação.</li>
+          <li>Qualquer tentativa de fraude implicará desclassificação imediata.</li>
+          <li>Os resultados serão anunciados durante o jantar de encerramento, no dia 24 de julho.</li>
+          <li>O jogo valerá até dia 24 as 12:00 AM.</li>
+        </ul>
+      </div>
       
       <div class="regulation-section">
         <h3>PREMIAÇÃO</h3>
@@ -632,90 +643,53 @@
     <button id="galleryBtn" class="photo-source-btn">ESCOLHER DA GALERIA</button>
     <button id="cancelPhotoBtn" class="photo-source-btn photo-source-cancel">CANCELAR</button>
   </div>
-<style>
-  .bingo-box {
-    word-break: keep-all;
-    overflow-wrap: break-word;
-    hyphens: manual;
-    text-align: center;
-    padding: 8px;
-    font-size: 12px;
-    line-height: 1.3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: uppercase;
-    height: 100%; /* ensures vertical alignment */
-  }
-</style>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script>
-  const FREE_IMAGE = 'logo.png';
-  const board = document.getElementById('board');
-  const downloadBtn = document.getElementById('download-btn');
-  const installBtn = document.getElementById('install-btn');
-  const photoSourceDialog = document.getElementById('photoSourceDialog');
-  const cameraBtn = document.getElementById('cameraBtn');
-  const galleryBtn = document.getElementById('galleryBtn');
-  const cancelPhotoBtn = document.getElementById('cancelPhotoBtn');
-  const splashScreen = document.getElementById('splash-screen');
-  const themeToggle = document.getElementById('theme-toggle');
-  const rulesToggle = document.getElementById('rules-toggle');
-  const rulesDialog = document.getElementById('rules-dialog');
-  const closeRules = document.getElementById('close-rules');
+  <script>
+    const FREE_IMAGE = 'logo.png';
+    const board = document.getElementById('board');
+    const downloadBtn = document.getElementById('download-btn');
+    const installBtn = document.getElementById('install-btn');
+    const photoSourceDialog = document.getElementById('photoSourceDialog');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const cancelPhotoBtn = document.getElementById('cancelPhotoBtn');
+    const splashScreen = document.getElementById('splash-screen');
+    const themeToggle = document.getElementById('theme-toggle');
+    const rulesToggle = document.getElementById('rules-toggle');
+    const rulesDialog = document.getElementById('rules-dialog');
+    const closeRules = document.getElementById('close-rules');
 
-  // Reordered challenges with the requested swaps
-  const challenges = [
-    "CRIAR UMA MASCOTE PARA A ACADEMIA",
-    "TIRAR UMA FOTO COM UMA LONA DE OBRA DA TUU",
-    "CONSTRUIR UMA PEQUENA ESTRUTURA COM LÁPIS/CANETA",
-    "TIRAR UMA FOTO COM O TEU GRUPO DO DESAFIO DE EMPREENDEDORISMO",
-    "TIRAR FOTO QUE REPRESENTE A ACADEMIA",
-    "FAZER UM PENTEADO DIFERENTE A OUTRO PARTICIPANTE",
-    "ENCONTRAR ALGUÉM QUE ESTEJA A USAR A MESMA COR QUE TU",
-    "TIRAR FOTO COM MAIS DE 30 PESSOAS",
-    "IMITAR UMA ESTÁTUA AO LADO DELA",
-    "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA",
-    "ENCONTRAR UM ESTRANHO COM UM BOM BIGODE",
-    "ENCONTRAR UM METRO BUS",
-    "FREE",
-    "TIRAR FOTO A UM CÃO",
-    "ENCONTRAR UM MUPI DA ACADEMIA",
-    "TIRAR FOTO COM UM TUU",
-    "TIRAR FOTO COM UM ORADOR",
-    "ENCONTRAR UM PARTICIPANTE COM MEIAS ENGRAÇADAS",
-    "DAR UMA LEMBRANÇA A OUTRO PARTICIPANTE",
-    "TIRAR FOTO A UMA STREET ART",
-    "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA",
-    "ENCONTRAR UM PARTICIPANTE QUE TENHA UMA TATUAGEM",
-    "TIRAR FOTO COM UMA OBRA DA TUU TERMINADA",
-    "VISITAR UM MONUMENTO CONHECIDO",
-    "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES"
-  ];
-
-  // Example code to generate the board with boxes (if not already present)
-  function generateBoard() {
-    board.innerHTML = '';
-    challenges.forEach((text, index) => {
-      const cell = document.createElement('div');
-      cell.className = 'bingo-box';
-      if (text === 'FREE') {
-        const img = document.createElement('img');
-        img.src = FREE_IMAGE;
-        img.alt = 'FREE';
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = '100%';
-        cell.appendChild(img);
-      } else {
-        cell.textContent = text;
-      }
-      board.appendChild(cell);
-    });
-  }
-
-  generateBoard(); // Call it once to create the board
-</script>
+    // Reordered challenges with the requested swaps:
+    // 1. "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA" swapped with "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA"
+    // 2. "TIRAR FOTO A UM CÃO" swapped with "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES"
+    const challenges = [
+      "CRIAR UMA MASCOTE PARA A ACADEMIA", // Top-left corner (0)
+      "TIRAR UMA FOTO COM UMA LONA DE OBRA DA TUU.",
+      "CONSTRUIR UMA PEQUENA ESTRUTURA COM LÁPIS/CANETA.",
+      "TIRAR UMA FOTO COM O TEU GRUPO DO DESAFIO DE EMPREENDEDORISMO.",
+      "TIRAR FOTO QUE REPRESENTE A ACADEMIA", // Top-right corner (4)
+      "FAZER UM PENTEADO DIFERENTE A OUTRO PARTICIPANTE.",
+      "ENCONTRAR ALGUÉM QUE ESTEJA A USAR A MESMA COR QUE TU.",
+      "TIRAR FOTO COM MAIS DE 30 PESSOAS.",
+      "IMITAR UMA ESTÁTUA AO LADO DELA.",
+      "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA.", // Swapped with "INVENTAR UM POEMA..." (now position 9)
+      "ENCONTRAR UM ESTRANHO COM UM BOM BIGODE.",
+      "ENCONTRAR UM METRO BUS.",
+      "FREE",
+      "TIRAR FOTO A UM CÃO.", // Swapped with "RECRIAR O LOGO..." (now position 13)
+      "ENCONTRAR UM MUPI DA ACADEMIA.",
+      "TIRAR FOTO COM UM TUU.",
+      "TIRAR FOTO COM UM ORADOR.",
+      "ENCONTRAR UM PARTICIPANTE COM MEIAS ENGRAÇADAS.",
+      "DAR UMA LEMBRANÇA A OUTRO PARTICIPANTE.",
+      "TIRAR FOTO A UMA STREET ART.",
+      "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA.", // Swapped with "TIRAR UMA FOTO COM ALGUÉM..." (now position 20)
+      "ENCONTRAR UM PARTICIPANTE QUE TENHA UMA TATUAGEM.",
+      "TIRAR FOTO COM UMA OBRA DA TUU TERMINADA.",
+      "VISITAR UM MONUMENTO CONHECIDO.",
+      "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES." // Swapped with "TIRAR FOTO A UM CÃO" (now position 24)
+    ];
 
     // Indexes of corner cells (0, 4, 20, 24 in a 5x5 grid)
     const cornerIndexes = [0, 4, 20, 24];
