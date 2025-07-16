@@ -769,7 +769,28 @@ body.light-mode #install-btn {
         deferredPrompt = null;
       }
     });
+// Verificar se está rodando como PWA instalada
+function isRunningAsPWA() {
+  return window.matchMedia('(display-mode: standalone)').matches || 
+         window.navigator.standalone ||
+         document.referrer.includes('android-app://');
+}
 
+// Modificar o evento beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Só mostra o botão se NÃO estiver rodando como PWA
+  if (!isRunningAsPWA()) {
+    installBtn.style.display = 'inline-block';
+  }
+});
+
+// Esconder o botão imediatamente se estiver como PWA
+if (isRunningAsPWA()) {
+  installBtn.style.display = 'none';
+}
     // IndexedDB functions
     function openDB() {
       return new Promise((resolve, reject) => {
