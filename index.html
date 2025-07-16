@@ -304,7 +304,7 @@
 
 #install-btn {
   background: #ffc400;
-  color: white; /* texto branco por padrão (modo escuro) */
+  color: white;
   font-family: 'DINBlack', sans-serif;
   font-weight: bold;
   padding: 10px 20px;
@@ -638,7 +638,10 @@ body.light-mode #install-btn {
     <div class="board" id="board"></div>
   </div>
 
+ <div id="install-container">
   <button id="install-btn">INSTALAR APLICAÇÃO</button>
+</div>
+
 
   <!-- Photo source selection dialog -->
   <div id="photoSourceDialog" class="photo-source-dialog" style="display: none;">
@@ -663,6 +666,12 @@ body.light-mode #install-btn {
     const rulesDialog = document.getElementById('rules-dialog');
     const closeRules = document.getElementById('close-rules');
 
+    // Esconde o botão de instalação se a app já estiver instalada
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+  const installContainer = document.getElementById('install-container');
+  if (installContainer) installContainer.style.display = 'none';
+}
+    
     // Reordered challenges with the requested swaps:
     // 1. "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA" swapped with "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA"
     // 2. "TIRAR FOTO A UM CÃO" swapped with "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES"
