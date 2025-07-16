@@ -304,17 +304,23 @@
     }
 
     #install-btn {
-      margin-top: 20px;
-      background: #ffc400;
-      color: black;
-      padding: 10px 20px;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-      display: none;
-      -webkit-appearance: none;
-    }
+  margin-top: 20px;
+  background: #ffc400;
+  color: white; /* Texto branco no modo escuro (padrão) */
+  padding: 10px 20px;
+  border: none;
+  font-size: 1em;
+  font-weight: 900; /* Mesma espessura do botão PRINTSCREEN */
+  cursor: pointer;
+  border-radius: 5px;
+  display: none;
+  -webkit-appearance: none;
+  transition: color 0.3s; /* Transição suave para mudança de tema */
+}
+
+body.light-mode #install-btn {
+  color: black; /* Texto preto no modo claro */
+}
 
     .board-wrapper {
       display: flex;
