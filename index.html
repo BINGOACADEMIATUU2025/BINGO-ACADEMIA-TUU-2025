@@ -2,8 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Desafio Gamificação</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=3, user-scalable=yes">
   <link rel="manifest" href="manifest.json" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,7 +14,21 @@
            url('https://fonts.cdnfonts.com/s/15151/DINBlack.woff') format('woff');
       font-weight: bold;
     }
+/* Melhorias para zoom */
+html {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+}
 
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.board-wrapper {
+    transform-origin: top center;
+    transition: transform 0.3s ease;
+}
     /* Extended splash screen (2 seconds) */
     #splash-screen {
       position: fixed;
