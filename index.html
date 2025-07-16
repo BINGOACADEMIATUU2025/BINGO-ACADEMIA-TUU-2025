@@ -2,8 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=3, user-scalable=yes">
-  <link rel="manifest" href="manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=3, user-scalable=yes, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000" />
@@ -14,6 +13,34 @@
            url('https://fonts.cdnfonts.com/s/15151/DINBlack.woff') format('woff');
       font-weight: bold;
     }
+    /* Espaçamento seguro para evitar cortes nas bordas */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+}
+
+/* Container principal ajustado */
+.board-wrapper {
+  width: calc(100% - 20px); /* Reduz a largura para considerar o padding */
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 10px; /* Espaço extra nos lados */
+}
+
+/* Ajuste para o cabeçalho do bingo */
+.bingo-header {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Ajuste para o título */
+.title-container {
+  padding: 0 10px; /* Mesmo espaçamento dos lados */
+}
 /* Melhorias para zoom */
 html {
     touch-action: manipulation;
@@ -677,7 +704,22 @@ body.light-mode #install-btn {
     const rulesToggle = document.getElementById('rules-toggle');
     const rulesDialog = document.getElementById('rules-dialog');
     const closeRules = document.getElementById('close-rules');
+    
+// Ajuste dinâmico para dispositivos com notch
+function adjustForNotch() {
+  const safeLeft = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-left') || '0px';
+  const safeRight = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-right') || '0px';
+  
+  if (safeLeft !== '0px' || safeRight !== '0px') {
+    document.body.style.paddingLeft = safeLeft;
+    document.body.style.paddingRight = safeRight;
+  }
+}
 
+// Chamar na inicialização e quando a orientação mudar
+window.addEventListener('load', adjustForNotch);
+window.addEventListener('resize', adjustForNotch);
+    
     // Reordered challenges with the requested swaps:
     // 1. "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA" swapped with "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA"
     // 2. "TIRAR FOTO A UM CÃO" swapped with "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES"
