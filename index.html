@@ -325,13 +325,15 @@
       -webkit-transform-origin: top center;
     }
 
-    .bingo-header {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 8px;
+.bingo-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 8px;
+  font-size: 24px; 
+}
     }
 
     .letter-cell {
@@ -665,30 +667,30 @@
     // 2. "TIRAR FOTO A UM CÃO" swapped with "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES"
     const challenges = [
       "CRIAR UMA MASCOTE PARA A ACADEMIA", // Top-left corner (0)
-      "TIRAR UMA FOTO COM UMA LONA DE OBRA DA TUU.",
-      "CONSTRUIR UMA PEQUENA ESTRUTURA COM LÁPIS/CANETA.",
-      "TIRAR UMA FOTO COM O TEU GRUPO DO DESAFIO DE EMPREENDEDORISMO.",
+      "TIRAR UMA FOTO COM UMA LONA DE OBRA DA TUU",
+      "CONSTRUIR UMA PEQUENA ESTRUTURA COM LÁPIS/CANETA",
+      "TIRAR UMA FOTO COM O TEU GRUPO DO DESAFIO DE EMPREENDEDORISMO",
       "TIRAR FOTO QUE REPRESENTE A ACADEMIA", // Top-right corner (4)
-      "FAZER UM PENTEADO DIFERENTE A OUTRO PARTICIPANTE.",
-      "ENCONTRAR ALGUÉM QUE ESTEJA A USAR A MESMA COR QUE TU.",
-      "TIRAR FOTO COM MAIS DE 30 PESSOAS.",
-      "IMITAR UMA ESTÁTUA AO LADO DELA.",
-      "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA.", // Swapped with "INVENTAR UM POEMA..." (now position 9)
-      "ENCONTRAR UM ESTRANHO COM UM BOM BIGODE.",
-      "ENCONTRAR UM METRO BUS.",
+      "FAZER UM PENTEADO DIFERENTE A OUTRO PARTICIPANTE",
+      "ENCONTRAR ALGUÉM QUE ESTEJA A USAR A MESMA COR QUE TU",
+      "TIRAR FOTO COM MAIS DE 30 PESSOAS",
+      "IMITAR UMA ESTÁTUA AO LADO DELA",
+      "TIRAR UMA FOTO COM ALGUÉM COM A CAMISOLA DA ACADÉMICA", // Swapped with "INVENTAR UM POEMA..." (now position 9)
+      "ENCONTRAR UM ESTRANHO COM UM BOM BIGODE",
+      "ENCONTRAR UM METRO BUS",
       "FREE",
-      "TIRAR FOTO A UM CÃO.", // Swapped with "RECRIAR O LOGO..." (now position 13)
-      "ENCONTRAR UM MUPI DA ACADEMIA.",
-      "TIRAR FOTO COM UM TUU.",
-      "TIRAR FOTO COM UM ORADOR.",
-      "ENCONTRAR UM PARTICIPANTE COM MEIAS ENGRAÇADAS.",
-      "DAR UMA LEMBRANÇA A OUTRO PARTICIPANTE.",
-      "TIRAR FOTO A UMA STREET ART.",
-      "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA.", // Swapped with "TIRAR UMA FOTO COM ALGUÉM..." (now position 20)
-      "ENCONTRAR UM PARTICIPANTE QUE TENHA UMA TATUAGEM.",
-      "TIRAR FOTO COM UMA OBRA DA TUU TERMINADA.",
-      "VISITAR UM MONUMENTO CONHECIDO.",
-      "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES." // Swapped with "TIRAR FOTO A UM CÃO" (now position 24)
+      "TIRAR FOTO A UM CÃO", // Swapped with "RECRIAR O LOGO..." (now position 13)
+      "ENCONTRAR UM MUPI DA ACADEMIA",
+      "TIRAR FOTO COM UM TUU",
+      "TIRAR FOTO COM UM ORADOR",
+      "ENCONTRAR UM PARTICIPANTE COM MEIAS ENGRAÇADAS",
+      "DAR UMA LEMBRANÇA A OUTRO PARTICIPANTE",
+      "TIRAR FOTO A UMA STREET ART",
+      "INVENTAR UM POEMA OU REFRÃO PARA A ACADEMIA", // Swapped with "TIRAR UMA FOTO COM ALGUÉM..." (now position 20)
+      "ENCONTRAR UM PARTICIPANTE QUE TENHA UMA TATUAGEM",
+      "TIRAR FOTO COM UMA OBRA DA TUU TERMINADA",
+      "VISITAR UM MONUMENTO CONHECIDO",
+      "RECRIAR O LOGO DA TUU COM O CORPO DE VÁRIOS PARTICIPANTES" // Swapped with "TIRAR FOTO A UM CÃO" (now position 24)
     ];
 
     // Indexes of corner cells (0, 4, 20, 24 in a 5x5 grid)
